@@ -1,67 +1,281 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Jays Ledger</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root{--ink:#4a1f33;--mute:#a0607a;--line:#ffc2d6;--soft:#ffd6e5;--rose:#e6417f;--rosed:#c42a66;--bad:#ffc9d6;--warn:#ffe9b8;--ok:#dff5d8;--grad:linear-gradient(135deg,#ff7eb3,#e6417f)}
-    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(180deg,#ffd0e2,#fff0f6 40%,#fff);color:var(--ink);font:14px Poppins,system-ui,sans-serif}header{position:sticky;top:0;z-index:2;background:var(--grad);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 4px 16px #e6417f55}h1,h2{font-family:'Playfair Display',Georgia,serif;margin:0}h1{font-size:24px}h2{font-size:20px;color:var(--rosed)}button{font:inherit;cursor:pointer;border:0}button:disabled{opacity:.6;cursor:wait}.wrap{max-width:1200px;margin:auto;padding:16px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 6px 18px #e6417f22;margin:10px 0}.login{max-width:420px;margin:7vh auto;text-align:center}.hint{font-size:12px;color:var(--mute)}input,select{font:inherit;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px;min-width:0}input:focus,select:focus{outline:2px solid #ff9fc0}.login input{width:100%;margin:6px 0;text-align:center}.btn,.ghost{padding:9px 14px;border-radius:11px;font-weight:500}.btn{background:var(--grad);color:#fff}.ghost{background:var(--soft);color:var(--rosed)}.bar,.nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}.nav{background:#ffffff55;border-radius:30px;padding:4px}.nav button{background:transparent;color:#fff;padding:7px 12px;border-radius:20px}.nav button.on{background:#fff;color:var(--rosed)}.seg{display:flex;background:var(--soft);border-radius:24px;padding:4px;margin:12px 0}.seg button{flex:1;background:none;color:var(--rosed);padding:8px;border-radius:20px}.seg button.on{background:var(--grad);color:white}.err{color:#c0143c;min-height:20px;font-size:13px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.pick{text-align:left;width:100%;color:var(--rosed)}.pick b{display:block;font-size:17px}.stat{background:var(--grad);color:#fff}.stat small{display:block}.stat strong{font-size:22px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:16px;background:#fff}table{border-collapse:collapse;width:100%;min-width:750px}th,td{text-align:left;padding:7px;border-bottom:1px solid var(--line)}th{background:var(--soft)}td input,td select{width:100%;min-width:100px}.item{display:flex;gap:10px;align-items:center;border-top:1px solid var(--line);padding:10px 2px}.item span:first-of-type{flex:1}.done{text-decoration:line-through;opacity:.55}.badge{display:inline-block;border-radius:20px;padding:2px 8px;background:var(--soft);font-size:11px}.notice{padding:12px;border-radius:12px;background:var(--warn);margin:10px 0;overflow-wrap:anywhere}.actions{display:flex;gap:8px;flex-wrap:wrap}
-  </style>
-</head>
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jays Ledger</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffe3ee;--card:#fff;--ink:#4a1f33;--mute:#a0607a;--line:#ffc2d6;--pink:#ff9fc0;--soft:#ffd6e5;--rose:#e6417f;--rosed:#c42a66;--gold:#e8a0a8;--bad:#ffc9d6;--badt:#c0143c;--warn:#ffe9b8;--ok:#cdf5dc;--grad:linear-gradient(135deg,#ff7eb3,#e6417f);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#ffd0e2,#fff0f6 40%,#fff);min-height:100vh;color:var(--ink);font-family:'Poppins',system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#ff7eb3;z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--grad);color:#fff;box-shadow:0 4px 16px rgba(230,65,127,.35);padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+h1,h2{font-family:'Playfair Display',Georgia,serif;margin:0}h1{font-size:24px}h2{font-size:20px;color:var(--rosed)}
+.wrap{max-width:1250px;margin:0 auto;padding:16px}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+.nav{display:flex;gap:4px;background:rgba(255,255,255,.25);padding:4px;border-radius:999px}
+.nav button{background:none;padding:7px 14px;border-radius:999px;font-weight:500;color:#fff}.nav button.on{background:#fff;color:var(--rosed)}
+.hr{display:flex;gap:8px;align-items:center}.hr .ghost{background:rgba(255,255,255,.9)}
+.btn{background:var(--grad);color:#fff;padding:9px 16px;border-radius:12px;font-weight:500;box-shadow:0 3px 8px rgba(230,65,127,.35)}
+.ghost{background:var(--soft);color:var(--rosed);padding:7px 12px;border-radius:12px;font-weight:500}
+.ghost.arm{background:var(--bad);color:var(--badt)}
+.x{background:none;color:var(--mute);padding:2px 6px;border-radius:8px}.x:hover,.x.arm{background:var(--bad);color:var(--badt)}
+.back{background:none;color:var(--rosed);font-weight:500;padding:4px 0;margin-bottom:6px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:10px 0 6px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:14px 16px;box-shadow:0 6px 18px rgba(230,65,127,.15)}
+.stat{background:var(--grad);color:#fff;border:0}.stat small{opacity:.9;display:block}.stat b{font-size:24px}
+.pick{text-align:left;font-size:15px;transition:transform .15s}.pick:hover{transform:translateY(-3px);border-color:var(--rose)}
+.pick b{display:block;font-size:18px;color:var(--rosed)}.pick small{color:var(--mute)}
+.hint{color:var(--mute);font-size:12px;margin:0 0 12px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+input,select{font:inherit;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:7px 9px;width:100%;min-width:0}
+input:focus,select:focus{outline:2px solid var(--pink);border-color:var(--rose)}
+.bar input,.bar select{width:auto}
+.gname{font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:600;width:230px;border-color:transparent;background:transparent;color:var(--rosed)}
+.tw{overflow-x:auto;background:var(--card);border:1.5px solid var(--line);border-radius:20px;box-shadow:0 6px 18px rgba(230,65,127,.15)}
+table{border-collapse:collapse;width:100%}
+th{background:var(--soft);padding:8px;text-align:left;white-space:nowrap;min-width:130px}th.n{min-width:0}
+th input{font-weight:600;border-color:transparent;background:transparent;padding:4px 6px}
+td{padding:6px;border-top:1px solid var(--line);vertical-align:middle}
+tr.bad td{background:var(--bad)}tr.soon td{background:var(--warn)}tr.bad input,tr.bad select,tr.soon input,tr.soon select{background:transparent}
+td.ro{white-space:nowrap;font-weight:600;color:var(--rosed);padding:6px 10px}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;margin:1px;white-space:nowrap;font-weight:500}
+.badge.low{background:var(--pink);color:var(--ink)}.badge.bad{background:var(--bad);color:var(--badt)}.badge.soon{background:var(--warn);color:var(--ink)}
+.p-Paid{background:var(--ok)!important}.p-Unpaid{background:var(--bad)!important}.p-Partial{background:var(--warn)!important}
+.empty{padding:28px;text-align:center;color:var(--mute)}
+.mm{position:relative}.mp{position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1.5px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(230,65,127,.25);padding:6px;z-index:15;min-width:250px;max-height:320px;overflow:auto}
+.mi{display:block;width:100%;text-align:left;background:none;padding:8px 10px;border-radius:10px}.mi:hover{background:var(--soft)}.mi.arm{background:var(--bad);color:var(--badt)}
+.two{display:grid;grid-template-columns:2fr 1fr;gap:16px}@media(max-width:800px){.two{grid-template-columns:1fr}}
+.prog{height:14px;background:var(--soft);border-radius:999px;overflow:hidden}.prog i{display:block;height:100%;background:var(--grad);border-radius:999px;transition:width .5s}
+.add{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;margin:12px 0}
+@media(max-width:560px){.add{grid-template-columns:1fr 1fr}.add input:first-child{grid-column:1/-1}}
+.item{display:flex;align-items:center;gap:10px;padding:10px 4px;border-top:1px solid var(--line)}
+.item .t{flex:1;transition:opacity .3s}.item.done .t{text-decoration:line-through;opacity:.5}
+.chk{width:28px;height:28px;border-radius:50%;border:2px solid var(--rose);background:#fff;color:#fff;font-size:15px;flex:none}
+.chk.on{background:var(--grad);animation:pop .45s}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.4) rotate(-12deg);box-shadow:0 0 0 8px rgba(255,159,192,.7)}100%{transform:scale(1)}}
+.pri-High{background:var(--bad);color:var(--badt)}.pri-Medium{background:var(--warn);color:var(--ink)}.pri-Low{background:var(--ok);color:var(--ink)}
+.login{max-width:400px;margin:6vh auto;text-align:center}.login .logo{font-size:48px}.login input{margin:6px 0;text-align:center;font-size:16px}
+.seg{display:flex;background:var(--soft);border-radius:999px;padding:4px;margin:12px 0}.seg button{flex:1;background:none;padding:8px;border-radius:999px;font-weight:500;color:var(--rosed)}.seg button.on{background:var(--grad);color:#fff}
+.err{color:var(--badt);font-size:13px;min-height:18px}
+.modal{position:fixed;inset:0;background:rgba(74,31,51,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}.modal .card{width:min(640px,100%)}
+textarea{width:100%;height:240px;font:12px monospace;border-radius:12px;border:1.5px solid var(--line);padding:8px}
+</style></head>
 <body><div id="root"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-(function(){
-  const root=document.getElementById('root');
-  function showFatal(message){root.innerHTML='<main class="wrap"><section class="card"><h2>Jays Ledger could not start</h2><p class="notice"></p><p>Reload the page. If it persists, check that the React, HTM, and Supabase CDN scripts are reachable.</p></section></main>';root.querySelector('.notice').textContent=message||'A startup error occurred.';}
-  window.addEventListener('error',function(e){if(root&&!root.hasChildNodes())showFatal(e.message);});
-  window.addEventListener('unhandledrejection',function(e){console.error('Unhandled app error:',e.reason);});
-  try{
-    if(!window.React||!window.ReactDOM||!window.htm)throw new Error('A required app library did not load. Check your connection or CDN access.');
-    const {useState,useEffect}=React,html=htm.bind(React.createElement);
-    const SUPABASE_URL='https://mpcwadvhhemkmsdzxuhq.supabase.co';
-    const SUPABASE_KEY='sb_publishable_rTfYJIm1l_O-y-PYzUdD1w_xSIWfLxD';
-    let db=null,configError='';
-    try{if(!window.supabase||typeof window.supabase.createClient!=='function')throw new Error('Supabase client library did not load.');db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){configError=e.message;}
-    const uid=()=>Math.random().toString(36).slice(2,10),today=()=>new Date().toISOString().slice(0,10),cash=n=>'₦'+Math.round(Number(n)||0).toLocaleString();
-    function phoneE164(raw){let d=String(raw||'').replace(/\D/g,'');if(d.startsWith('0'))d='234'+d.slice(1);if(!d.startsWith('234')&&d.length<=10)d='234'+d;return '+'+d;}
-    function seed(){return {businesses:[{id:uid(),name:"jay's_apparel",groups:[{id:uid(),name:'In Stock',stock:true,rows:[]},{id:uid(),name:'Orders',stock:false,rows:[]}]}],tasks:[],habits:[]};}
-    async function readLedger(userId){const {data,error}=await db.from('accounts').select('data').eq('user_id',userId).maybeSingle();if(error)throw error;if(!data)return null;return typeof data.data==='string'?JSON.parse(data.data):data.data;}
-    async function saveLedger(userId,phone,ledger){const {error}=await db.from('accounts').upsert({phone,user_id:userId,data:ledger,updated_at:new Date().toISOString()},{onConflict:'phone'});if(error)throw error;}
-    function Login({onLogin}){
-      const [mode,setMode]=useState('login'),[phone,setPhone]=useState(''),[code,setCode]=useState(''),[sent,setSent]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
-      const send=async()=>{setError('');if(!db)return setError(configError||'Supabase is unavailable.');const p=phoneE164(phone);if(p.length<10)return setError('Enter a valid phone number, including country code.');setBusy(true);try{const {error:e}=await db.auth.signInWithOtp({phone:p,options:{shouldCreateUser:mode==='register'}});if(e)throw e;setPhone(p);setSent(true);}catch(e){setError(e.message||'Could not send verification code. Check Phone Auth and SMS settings in Supabase.');}finally{setBusy(false)}};
-      const verify=async()=>{setError('');if(!code.trim())return setError('Enter the SMS verification code.');setBusy(true);try{const p=phoneE164(phone);const {data,error:e}=await db.auth.verifyOtp({phone:p,token:code.trim(),type:'sms'});if(e)throw e;if(!data.user)throw new Error('Verified session did not include a user.');let ledger=await readLedger(data.user.id);if(!ledger){if(mode!=='register')throw new Error('No ledger exists for this account. Choose Register first.');ledger=seed();await saveLedger(data.user.id,p,ledger);}onLogin({id:data.user.id,phone:p},ledger);}catch(e){setError(e.message||'Could not verify the code.');}finally{setBusy(false)}};
-      return html`<main class="wrap"><section class="card login"><div style=${{fontSize:48}}>💖</div><h1 style=${{color:'#c42a66'}}>Jays Ledger</h1><p class="hint">Sign in with a one-time phone code to sync your ledger across devices.</p><div class="seg"><button className=${mode==='login'?'on':''} onClick=${()=>{setMode('login');setSent(false);setCode('');setError('')}}>Login</button><button className=${mode==='register'?'on':''} onClick=${()=>{setMode('register');setSent(false);setCode('');setError('')}}>Register</button></div><input type="tel" inputMode="tel" placeholder="Phone number, e.g. 0801 234 5678" value=${phone} onChange=${e=>setPhone(e.target.value)} /><${sent?html`<input inputMode="numeric" autoComplete="one-time-code" placeholder="SMS verification code" value=${code} onChange=${e=>setCode(e.target.value)} />`:null}<div class="err">${error}</div><button class="btn" disabled=${busy} onClick=${sent?verify:send}>${busy?'Please wait…':sent?'Verify code':'Send code'}</button>${configError?html`<p class="hint">${configError}</p>`:null}</section></main>`;
-    }
-    function App(){
-      const [account,setAccount]=useState(null),[ledger,setLedger]=useState(null),[tab,setTab]=useState('business'),[businessId,setBusinessId]=useState(null),[groupId,setGroupId]=useState(null),[status,setStatus]=useState('');
-      useEffect(()=>{if(!account||!ledger)return;const t=setTimeout(async()=>{try{await saveLedger(account.id,account.phone,ledger);setStatus('Saved to Supabase');}catch(e){setStatus('Save failed: '+e.message);}},500);return()=>clearTimeout(t)},[account,ledger]);
-      const update=fn=>setLedger(prev=>{const copy=JSON.parse(JSON.stringify(prev));fn(copy);return copy;});
-      if(!account)return html`<${Login} onLogin=${(a,d)=>{setAccount(a);setLedger(d)}} />`;
-      const biz=ledger.businesses.find(b=>b.id===businessId),group=biz&&biz.groups.find(g=>g.id===groupId);
-      const signOut=async()=>{try{await db.auth.signOut()}catch(e){}setAccount(null);setLedger(null);setBusinessId(null);setGroupId(null)};
-      const addBusiness=()=>{const name=prompt('Business name?');if(!name||!name.trim())return;const b={id:uid(),name:name.trim(),groups:[{id:uid(),name:'In Stock',stock:true,rows:[]},{id:uid(),name:'Orders',stock:false,rows:[]}]};update(d=>d.businesses.push(b));setBusinessId(b.id);setGroupId(null)};
-      const addGroup=()=>{const name=prompt('Group name?');if(!name||!name.trim())return;const g={id:uid(),name:name.trim(),stock:false,rows:[]};update(d=>d.businesses.find(x=>x.id===biz.id).groups.push(g));setGroupId(g.id)};
-      const addRow=()=>update(d=>d.businesses.find(x=>x.id===biz.id).groups.find(x=>x.id===group.id).rows.push({id:uid(),buyer:'',item:'',cost:'',sell:'',qty:1,paid:'',due:'',notes:''}));
-      const addTask=()=>{const text=prompt('Task?');if(text&&text.trim())update(d=>d.tasks.push({id:uid(),text:text.trim(),date:today(),done:false,priority:'Medium'}))};
-      const addHabit=()=>{const name=prompt('Habit?');if(name&&name.trim())update(d=>d.habits.push({id:uid(),name:name.trim(),log:{}}))};
-      const toggleHabit=id=>update(d=>{const h=d.habits.find(x=>x.id===id);h.log=h.log||{};h.log[today()]=!h.log[today()]});
-      const total=()=>{let revenue=0,profit=0,pending=0;ledger.businesses.forEach(b=>b.groups.forEach(g=>g.rows.forEach(r=>{const qty=Number(r.qty)||0,sell=Number(r.sell)||0,cost=Number(r.cost)||0,paid=Number(r.paid)||0;revenue+=sell*qty;profit+=(sell-cost)*qty;pending+=Math.max(0,sell*qty-paid)})));return{revenue,profit,pending}};
-      const t=total();
-      return html`<><header><h1>💖 Jays Ledger</h1><div class="nav"><button className=${tab==='business'?'on':''} onClick=${()=>{setTab('business');setBusinessId(null);setGroupId(null)}}>Business Tracker</button><button className=${tab==='daily'?'on':''} onClick=${()=>setTab('daily')}>Daily Activities</button></div><div class="actions"><span>${status}</span><button class="ghost" onClick=${signOut}>Sign out</button></div></header><main class="wrap">
-        ${tab==='business'?html`<div class="cards"><div class="card stat"><small>Total Revenue</small><strong>${cash(t.revenue)}</strong></div><div class="card stat"><small>Total Profit</small><strong>${cash(t.profit)}</strong></div><div class="card stat"><small>Pending Balances</small><strong>${cash(t.pending)}</strong></div></div>
-          ${!biz?html`<div class="bar"><h2 style=${{flex:1}}>Businesses</h2><button class="btn" onClick=${addBusiness}>+ Add business</button></div><div class="cards">${ledger.businesses.map(b=>html`<button class="card pick" key=${b.id} onClick=${()=>{setBusinessId(b.id);setGroupId(null)}}><b>🛍️ ${b.name}</b><span>${b.groups.reduce((n,g)=>n+g.rows.length,0)} entries</span></button>`)}</div>`:!group?html`<button class="ghost" onClick=${()=>setBusinessId(null)}>← Businesses</button><h2>${biz.name}</h2><div class="cards">${biz.groups.map(g=>html`<button class="card pick" key=${g.id} onClick=${()=>setGroupId(g.id)}><b>${g.stock?'📦':'🧾'} ${g.name}</b><span>${g.rows.length} entries</span></button>`)}<button class="card pick" onClick=${addGroup}><b>+ Add group</b></button></div>`:html`<button class="ghost" onClick=${()=>setGroupId(null)}>← ${biz.name}</button><h2>${group.name}</h2><div class="bar"><button class="btn" onClick=${addRow}>+ Add row</button></div><div class="tablewrap"><table><thead><tr>${['Buyer','Item','Cost','Selling price','Qty','Paid','Due date','Notes',''].map(x=>html`<th>${x}</th>`)}</tr></thead><tbody>${group.rows.map(r=>html`<tr key=${r.id}>${[['buyer','text'],['item','text'],['cost','number'],['sell','number'],['qty','number'],['paid','number'],['due','date'],['notes','text']].map(([k,type])=>html`<td><input type=${type} value=${r[k]??''} onChange=${e=>update(d=>{const row=d.businesses.find(x=>x.id===biz.id).groups.find(x=>x.id===group.id).rows.find(x=>x.id===r.id);row[k]=e.target.value})} /></td>`)}<td><button class="ghost" onClick=${()=>update(d=>{const g=d.businesses.find(x=>x.id===biz.id).groups.find(x=>x.id===group.id);g.rows=g.rows.filter(x=>x.id!==r.id)})}>Delete</button></td></tr>`)}</tbody></table>${!group.rows.length?html`<p class="hint" style=${{padding:16}}>No rows yet. Add your first row.</p>`:null}</div>`}`:html`<div class="two"><section class="card"><div class="bar"><h2 style=${{flex:1}}>Daily tasks</h2><button class="btn" onClick=${addTask}>+ Task</button></div>${ledger.tasks.map(task=>html`<div class="item" key=${task.id}><input type="checkbox" checked=${!!task.done} onChange=${()=>update(d=>{d.tasks.find(x=>x.id===task.id).done=!task.done})} /><span className=${task.done?'done':''}>${task.text}</span><button class="ghost" onClick=${()=>update(d=>{d.tasks=d.tasks.filter(x=>x.id!==task.id)})}>Delete</button></div>`)}</section><section class="card"><div class="bar"><h2 style=${{flex:1}}>Habits</h2><button class="btn" onClick=${addHabit}>+ Habit</button></div>${ledger.habits.map(h=>html`<div class="item" key=${h.id}><input type="checkbox" checked=${!!(h.log&&h.log[today()])} onChange=${()=>toggleHabit(h.id)} /><span>${h.name}</span><button class="ghost" onClick=${()=>update(d=>{d.habits=d.habits.filter(x=>x.id!==h.id)})}>Delete</button></div>`)}</section></div>`}
-      </main></>`;
-    }
-    ReactDOM.createRoot(root).render(html`<${App} />`);
-  }catch(e){console.error('Jays Ledger startup error:',e);showFatal(e&&e.message);}
-})();
-</script>
-</body></html>
+const {useState,useEffect,useRef}=React;const html=htm.bind(React.createElement);
+const uid=()=>Math.random().toString(36).slice(2,9);
+const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+const num=v=>parseFloat(v)||0;
+const fmt=n=>(n<0?'-':'')+'₦'+Math.abs(Math.round(n)).toLocaleString();
+const PAY=['Paid','Partial','Unpaid'],FUL=['In Stock','Sourcing','Ready for Pickup','Out for Delivery','Delivered'];
+const DEF=[
+{id:'buyer',label:'Buyer Name',type:'text'},{id:'phone',label:'Phone / WhatsApp Contact',type:'tel'},
+{id:'item',label:'Item Name / Description',type:'text'},{id:'cost',label:'Cost Price',type:'money'},
+{id:'sell',label:'Selling Price',type:'money'},{id:'qty',label:'Quantity',type:'number'},
+{id:'paid',label:'Amount Paid',type:'money'},{id:'pay',label:'Payment Status',type:'select',opts:PAY},
+{id:'bal',label:'Balance Due',type:'money'},{id:'due',label:'Due Date',type:'date'},
+{id:'ful',label:'Fulfillment Status',type:'select',opts:FUL},{id:'notes',label:'Delivery Location / Notes',type:'text'}];
+const bal=r=>(r.bal!==undefined&&r.bal!=='')?num(r.bal):num(r.sell)*num(r.qty)-num(r.paid);
+const profit=r=>(num(r.sell)-num(r.cost))*num(r.qty);
+const mkGroup=(name,stock)=>({id:uid(),name,stock,cols:JSON.parse(JSON.stringify(DEF)),rows:[]});
+const totals=b=>{let rev=0,prof=0,pend=0;b.groups.forEach(x=>x.rows.forEach(r=>{if(String(r.buyer||'').trim()){rev+=num(r.sell)*num(r.qty);prof+=profit(r);pend+=Math.max(0,bal(r))}}));return{rev,prof,pend}};
+
+function newData(){
+  const a=mkGroup('In Stock',true),b=mkGroup('Orders',false);
+  a.rows=[{id:uid(),sample:1,item:'Ankara maxi dress',cost:8000,sell:15000,qty:2,bal:0,ful:'In Stock'}];
+  b.rows=[
+    {id:uid(),sample:1,buyer:'Amina B.',phone:'+234 801 234 5678',item:'Lace gown (size 12)',cost:12000,sell:22000,qty:1,paid:10000,pay:'Partial',due:addDays(-2),ful:'Sourcing',notes:'Deliver to Bosso, Minna'},
+    {id:uid(),sample:1,buyer:'Zainab K.',phone:'+234 803 987 6543',item:'Ankara two-piece set',cost:9000,sell:16500,qty:1,paid:16500,pay:'Paid',due:addDays(5),ful:'Delivered',notes:'Pickup done'}];
+  const t=iso(new Date());
+  let d={businesses:[{id:uid(),name:"jay's_apparel",groups:[a,b]}],
+    habits:[{id:uid(),sample:1,name:'Drink 2L of water',log:{}},{id:uid(),sample:1,name:'Update the ledger',log:{}}],
+    tasks:[{id:uid(),sample:1,text:'Follow up on Amina’s balance',pri:'High',time:'10:00',done:false,date:t},
+    {id:uid(),sample:1,text:'Pick up new stock from the market',pri:'Medium',time:'14:00',done:false,date:t},
+    {id:uid(),sample:1,text:'Post new arrivals on WhatsApp status',pri:'Low',time:'17:00',done:false,date:t}]};
+  try{const o=JSON.parse(localStorage.getItem('blush-planner-v1'));if(o&&o.groups){d.businesses[0].groups=o.groups;d.tasks=o.tasks||[];d.habits=o.habits||[]}}catch(e){}
+  return d;
+}
+
+/* ---------- storage: cloud (db) when available, else this device ---------- */
+let dbP;const getDb=()=>dbP||(dbP=(async()=>{try{return await window.claude.use('db')}catch(e){return null}})());
+const norm=p=>{p=String(p).replace(/\D/g,'');if(p.length===11&&p[0]==='0')p='234'+p.slice(1);return p};
+const hash=async s=>{try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('jl:'+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return'p:'+s}};
+const readAcct=async p=>{const db=await getDb();
+  if(db){try{const s=await db.doc('accounts/'+p).get();return s.exists?s.data():null}catch(e){}}
+  try{return JSON.parse(localStorage.getItem('jl-acct-'+p))}catch(e){return null}};
+const writeAcct=async(p,rec)=>{const db=await getDb();
+  if(db){try{await db.doc('accounts/'+p).set(rec);return'cloud'}catch(e){}}
+  try{localStorage.setItem('jl-acct-'+p,JSON.stringify(rec))}catch(e){}return'device'};
+
+function Confirm({onYes,label,cls='ghost'}){
+  const [a,setA]=useState(false);
+  useEffect(()=>{if(a){const t=setTimeout(()=>setA(false),2500);return()=>clearTimeout(t)}},[a]);
+  return html`<button className=${cls+(a?' arm':'')} onClick=${()=>a?(setA(false),onYes()):setA(true)}>${a?'Sure?':label}</button>`;
+}
+function Manage({items}){
+  const [o,setO]=useState(false),[a,setA]=useState(-1);
+  return html`<div className="mm"><button className="ghost" onClick=${()=>{setO(!o);setA(-1)}}>⋯ Manage ▾</button>
+    ${o?html`<div className="mp">${items.map((it,i)=>html`<button key=${i} className=${'mi'+(a===i?' arm':'')} onClick=${()=>a===i?(setO(false),it.fn()):setA(i)}>${a===i?'Tap again to confirm: ':''}${it.label}</button>`)}</div>`:null}</div>`;
+}
+
+function Login({onIn}){
+  const [mode,setMode]=useState('login'),[ph,setPh]=useState(''),[pin,setPin]=useState(''),[pin2,setPin2]=useState(''),[err,setErr]=useState(''),[busy,setBusy]=useState(false);
+  const go=async()=>{setErr('');const p=norm(ph);
+    if(p.length<10)return setErr('Please enter a valid phone number.');
+    if(pin.length<4)return setErr('PIN must be at least 4 digits.');
+    setBusy(true);try{
+      const h=await hash(pin);let rec=await readAcct(p);
+      if(mode==='register'){
+        if(rec)return setErr('This number is already registered. Please log in.');
+        if(pin!==pin2)return setErr('The two PINs do not match.');
+        rec={pin:h,data:JSON.stringify(newData())};await writeAcct(p,rec);
+      }else{
+        if(!rec)return setErr('No account for this number yet. Tap Register.');
+        if(rec.pin!==h)return setErr('Wrong PIN. Please try again.');
+      }
+      onIn(p,h,JSON.parse(rec.data));
+    }finally{setBusy(false)}};
+  const key=e=>e.key==='Enter'&&go();
+  return html`<div className="wrap"><div className="card login">
+    <div className="logo">💖</div><h1 style=${{color:'#c42a66'}}>Jays Ledger</h1>
+    <p className="hint">Sign in with your phone number to see your business anywhere.</p>
+    <div className="seg"><button className=${mode==='login'?'on':''} onClick=${()=>{setMode('login');setErr('')}}>Login</button><button className=${mode==='register'?'on':''} onClick=${()=>{setMode('register');setErr('')}}>Register</button></div>
+    <input type="tel" inputMode="tel" placeholder="Phone number e.g. 0801 234 5678" value=${ph} onChange=${e=>setPh(e.target.value)} onKeyDown=${key} />
+    <input type="password" inputMode="numeric" placeholder=${mode==='register'?'Create a PIN (4+ digits)':'Your PIN'} value=${pin} onChange=${e=>setPin(e.target.value)} onKeyDown=${key} />
+    ${mode==='register'?html`<input type="password" inputMode="numeric" placeholder="Repeat PIN" value=${pin2} onChange=${e=>setPin2(e.target.value)} onKeyDown=${key} />`:null}
+    <div className="err">${err}</div>
+    <button className="btn" style=${{width:'100%'}} disabled=${busy} onClick=${go}>${busy?'Please wait…':mode==='register'?'Create my account':'Log in'}</button>
+  </div></div>`;
+}
+
+function Businesses({s,set,nav}){
+  const [n,setN]=useState('');
+  const add=()=>{if(!n.trim())return;const id=uid();set(p=>{p.businesses.push({id,name:n.trim(),groups:[mkGroup('In Stock',true),mkGroup('Orders',false)]});return p});setN('');nav({bid:id,gid:null})};
+  return html`<div><h2>Choose your business</h2><p className="hint">Pick a business to open its In Stock and Orders.</p>
+    <div className="cards">${s.businesses.map(b=>html`<button key=${b.id} className="card pick" onClick=${()=>nav({bid:b.id,gid:null})}>
+      <b>🛍️ ${b.name}</b><small>${b.groups.reduce((a,g)=>a+g.rows.length,0)} entries · ${fmt(totals(b).pend)} pending</small></button>`)}</div>
+    <div className="bar"><input placeholder="New business name…" value=${n} onChange=${e=>setN(e.target.value)} onKeyDown=${e=>e.key==='Enter'&&add()} /><button className="btn" onClick=${add}>+ Add business</button></div></div>`;
+}
+
+function toCsv(b){
+  const e=v=>{v=String(v??'');return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+  return '\ufeff'+b.groups.map(x=>[['Group',...x.cols.map(c=>c.label),'Profit'],...x.rows.map(r=>[x.name,...x.cols.map(c=>c.id==='bal'?bal(r):r[c.id]??''),profit(r)])].map(l=>l.map(e).join(',')).join('\n')).join('\n\n');
+}
+function useCsv(b){
+  const [csv,setCsv]=useState(null),ta=useRef();
+  const exp=async()=>{const data=toCsv(b);try{const d=await window.claude.use('downloads');if(!d)throw 0;await d.save({filename:'jays-ledger-'+b.name.replace(/\W+/g,'-')+'.csv',data})}catch(e){setCsv(data)}};
+  const modal=csv!==null?html`<div className="modal"><div className="card"><b>Your CSV</b>
+    <p className="hint">Direct download wasn’t available. Copy this and paste it into Sheets, or save it as a .csv file.</p>
+    <textarea ref=${ta} readOnly value=${csv}></textarea>
+    <div className="bar"><button className="btn" onClick=${()=>{ta.current.select();try{document.execCommand('copy')}catch(e){}}}>Copy</button><button className="ghost" onClick=${()=>setCsv(null)}>Close</button></div></div></div>`:null;
+  return[exp,modal];
+}
+
+function BizHome({s,set,b,nav}){
+  const [exp,modal]=useCsv(b);const t=totals(b);
+  const ub=fn=>set(p=>{fn(p.businesses.find(x=>x.id===b.id));return p});
+  return html`<div><button className="back" onClick=${()=>nav({bid:null,gid:null})}>← All businesses</button>
+    <div className="bar"><input className="gname" value=${b.name} onChange=${e=>ub(x=>{x.name=e.target.value})} />
+      <button className="ghost" onClick=${exp}>⬇ Export CSV</button>
+      <${Manage} items=${[{label:'Delete business “'+b.name+'”',fn:()=>{set(p=>{p.businesses=p.businesses.filter(x=>x.id!==b.id);return p});nav({bid:null,gid:null})}}]} /></div>
+    <div className="cards"><div className="card stat"><small>Total Revenue</small><b>${fmt(t.rev)}</b></div><div className="card stat"><small>Total Profit</small><b>${fmt(t.prof)}</b></div><div className="card stat"><small>Pending Balances</small><b>${fmt(t.pend)}</b></div></div>
+    <p className="hint">Totals count rows that have a buyer name.</p>
+    <h2>Stock & Orders</h2>
+    <div className="cards">${b.groups.map(g=>html`<button key=${g.id} className="card pick" onClick=${()=>nav({bid:b.id,gid:g.id})}><b>${g.stock?'📦':'🧾'} ${g.name}</b>
+      <small>${g.rows.length} ${g.rows.length===1?'entry':'entries'}${g.stock?'':' · '+fmt(g.rows.reduce((a,r)=>a+Math.max(0,bal(r)),0))+' pending'}</small></button>`)}
+      <button className="card pick" style=${{borderStyle:'dashed'}} onClick=${()=>{const g=mkGroup('New Group',false);ub(x=>{x.groups.push(g)});nav({bid:b.id,gid:g.id})}}><b>+ Add group</b><small>Create a new section</small></button></div>
+    ${modal}</div>`;
+}
+
+function Detail({s,set,b,g,nav}){
+  const [q,setQ]=useState(''),[fp,setFp]=useState(''),[ff,setFf]=useState(''),[nt,setNt]=useState('text');
+  const [exp,modal]=useCsv(b);
+  const today=iso(new Date()),in3=addDays(3);
+  const upd=fn=>set(p=>{fn(p.businesses.find(x=>x.id===b.id).groups.find(y=>y.id===g.id));return p});
+  const updRow=(id,k,v)=>upd(x=>{const r=x.rows.find(y=>y.id===id);r[k]=v;if(['sell','qty','paid'].includes(k))delete r.bal});
+  const rows=g.rows.filter(r=>(!q||JSON.stringify(Object.values(r)).toLowerCase().includes(q.toLowerCase()))&&(!fp||r.pay===fp)&&(!ff||r.ful===ff));
+  const alerts=r=>{const o=[],bl=bal(r);
+    if(g.stock&&r.qty!==''&&r.qty!==undefined&&num(r.qty)<=2)o.push(['low','Low stock']);
+    if(r.due&&bl>0&&r.pay!=='Paid')o.push(r.due<today?['bad','Overdue']:r.due<=in3?['soon','Due soon']:null);
+    return o.filter(Boolean)};
+  const cell=(c,r)=>{
+    const v=c.id==='bal'?bal(r):(r[c.id]??'');const on=e=>updRow(r.id,c.id,e.target.value);
+    if(c.type==='select')return html`<select className=${c.id==='pay'?'p-'+v:''} value=${v} onChange=${on}><option value=""></option>${(c.opts||[]).map(o=>html`<option key=${o} value=${o}>${o}</option>`)}</select>`;
+    const money=c.type==='money'||c.type==='number';
+    return html`<input type=${money?'number':c.type} inputMode=${money?'decimal':undefined} style=${{minWidth:money?'95px':c.type==='date'?'135px':'140px'}} value=${v} onChange=${on} />`;
+  };
+  const items=[{label:'Delete group “'+g.name+'”',fn:()=>{set(p=>{const x=p.businesses.find(y=>y.id===b.id);x.groups=x.groups.filter(y=>y.id!==g.id);return p});nav({bid:b.id,gid:null})}},
+    ...g.cols.map(c=>({label:'Delete column “'+c.label+'”',fn:()=>upd(x=>{x.cols=x.cols.filter(y=>y.id!==c.id)})}))];
+  return html`<div><button className="back" onClick=${()=>nav({bid:b.id,gid:null})}>← ${b.name}</button>
+    <div className="bar"><input className="gname" value=${g.name} title="Rename group" onChange=${e=>upd(x=>{x.name=e.target.value})} /></div>
+    <div className="bar">
+      <input placeholder="Search buyer, item…" value=${q} onChange=${e=>setQ(e.target.value)} />
+      <select value=${fp} onChange=${e=>setFp(e.target.value)}><option value="">All payments</option>${PAY.map(o=>html`<option key=${o}>${o}</option>`)}</select>
+      <select value=${ff} onChange=${e=>setFf(e.target.value)}><option value="">All fulfillment</option>${FUL.map(o=>html`<option key=${o}>${o}</option>`)}</select>
+      <button className="btn" onClick=${()=>upd(x=>{x.rows.push({id:uid(),qty:1,pay:x.stock?'':'Unpaid',ful:x.stock?'In Stock':'Sourcing'})})}>+ Add row</button>
+      <select value=${nt} onChange=${e=>setNt(e.target.value)} title="Type for new column"><option value="text">Text</option><option value="number">Number</option><option value="money">Money</option><option value="date">Date</option></select>
+      <button className="ghost" onClick=${()=>upd(x=>{x.cols.push({id:uid(),label:'New column',type:nt})})}>+ Column</button>
+      <button className="ghost" onClick=${exp}>⬇ Export CSV</button>
+      <${Manage} items=${items} />
+    </div>
+    <div className="tw"><table>
+      <thead><tr><th className="n">Alerts</th>
+        ${g.cols.map(c=>html`<th key=${c.id}><input value=${c.label} title="Rename column" onChange=${e=>upd(x=>{x.cols.find(y=>y.id===c.id).label=e.target.value})} /></th>`)}
+        <th className="n">Profit</th><th className="n"></th></tr></thead>
+      <tbody>${rows.map(r=>{const al=alerts(r);return html`<tr key=${r.id} className=${al.some(a=>a[0]==='bad')?'bad':al.some(a=>a[0]==='soon')?'soon':''}>
+        <td>${al.map(a=>html`<span key=${a[1]} className=${'badge '+a[0]}>${a[1]}</span>`)}</td>
+        ${g.cols.map(c=>html`<td key=${c.id}>${cell(c,r)}</td>`)}
+        <td className="ro">${fmt(profit(r))}</td>
+        <td><${Confirm} cls="x" label="🗑" onYes=${()=>upd(x=>{x.rows=x.rows.filter(y=>y.id!==r.id)})} /></td></tr>`})}</tbody>
+    </table>${rows.length===0?html`<div className="empty">No rows here yet. Tap “+ Add row” ✨</div>`:null}</div>${modal}</div>`;
+}
+
+function Daily({s,set}){
+  const [d,setD]=useState(iso(new Date()));
+  const [tx,setTx]=useState(''),[pr,setPr]=useState('Medium'),[tm,setTm]=useState(''),[hn,setHn]=useState('');
+  const po={High:0,Medium:1,Low:2};
+  const list=s.tasks.filter(t=>t.date===d).sort((a,b)=>a.done-b.done||(a.time||'99').localeCompare(b.time||'99')||po[a.pri]-po[b.pri]);
+  const done=list.filter(t=>t.done).length,pct=list.length?Math.round(done/list.length*100):0;
+  const add=()=>{if(!tx.trim())return;set(p=>{p.tasks.push({id:uid(),text:tx.trim(),pri:pr,time:tm,done:false,date:d});return p});setTx('');setTm('')};
+  const addH=()=>{if(hn.trim()){set(p=>{p.habits.push({id:uid(),name:hn.trim(),log:{}});return p});setHn('')}};
+  const streak=h=>{let n=0;const c=new Date(d+'T00:00');if(!h.log[d])c.setDate(c.getDate()-1);while(h.log[iso(c)]){n++;c.setDate(c.getDate()-1)}return n};
+  const msg=!list.length?'Add your first task for the day 🌸':pct===100?'All done for today! ✨':done+' of '+list.length+' done';
+  return html`<div className="two">
+    <div className="card"><div className="bar"><h2>Today’s plan</h2><input type="date" value=${d} onChange=${e=>e.target.value&&setD(e.target.value)} /></div>
+      <div className="prog"><i style=${{width:pct+'%'}}></i></div><p className="hint" style=${{marginTop:6}}>${msg} · ${pct}%</p>
+      <div className="add"><input placeholder="Add a task…" value=${tx} onChange=${e=>setTx(e.target.value)} onKeyDown=${e=>e.key==='Enter'&&add()} />
+        <select value=${pr} onChange=${e=>setPr(e.target.value)}><option>High</option><option>Medium</option><option>Low</option></select>
+        <input type="time" value=${tm} onChange=${e=>setTm(e.target.value)} /><button className="btn" onClick=${add}>Add</button></div>
+      ${list.map(t=>html`<div key=${t.id} className=${'item'+(t.done?' done':'')}>
+        <button className=${'chk'+(t.done?' on':'')} aria-label="Toggle done" onClick=${()=>set(p=>{p.tasks.find(y=>y.id===t.id).done=!t.done;return p})}>${t.done?'✓':''}</button>
+        <span className="t">${t.text}</span>${t.time?html`<span className="badge low">${t.time}</span>`:null}<span className=${'badge pri-'+t.pri}>${t.pri}</span>
+        <button className="x" onClick=${()=>set(p=>{p.tasks=p.tasks.filter(y=>y.id!==t.id);return p})}>✕</button></div>`)}</div>
+    <div className="card"><h2>Habits & routines</h2>
+      <div className="add" style=${{gridTemplateColumns:'1fr auto'}}><input placeholder="New habit…" value=${hn} onChange=${e=>setHn(e.target.value)} onKeyDown=${e=>e.key==='Enter'&&addH()} /><button className="btn" onClick=${addH}>Add</button></div>
+      ${s.habits.map(h=>html`<div key=${h.id} className=${'item'+(h.log[d]?' done':'')}>
+        <button className=${'chk'+(h.log[d]?' on':'')} aria-label="Toggle habit" onClick=${()=>set(p=>{const x=p.habits.find(y=>y.id===h.id);x.log[d]=!x.log[d];return p})}>${h.log[d]?'✓':''}</button>
+        <span className="t">${h.name}</span><span className="badge low">${streak(h)}🔥</span>
+        <button className="x" onClick=${()=>set(p=>{p.habits=p.habits.filter(y=>y.id!==h.id);return p})}>✕</button></div>`)}</div>
+  </div>`;
+}
+
+function App(){
+  const [acct,setAcct]=useState(null),[s,setS]=useState(null),[tab,setTab]=useState('biz'),[nv,nav]=useState({bid:null,gid:null}),[st,setSt]=useState('');
+  useEffect(()=>{if(!acct||!s)return;const t=setTimeout(async()=>setSt(await writeAcct(acct.phone,{pin:acct.pin,data:JSON.stringify(s)})),700);return()=>clearTimeout(t)},[s,acct]);
+  if(!acct)return html`<${Login} onIn=${(phone,pin,data)=>{setS(data);setAcct({phone,pin})}} />`;
+  const set=fn=>setS(p=>fn(JSON.parse(JSON.stringify(p))));
+  const has=s.businesses.some(b=>b.groups.some(x=>x.rows.some(r=>r.sample)))||s.tasks.some(t=>t.sample)||s.habits.some(h=>h.sample);
+  const clear=()=>set(p=>{p.businesses.forEach(b=>b.groups.forEach(x=>{x.rows=x.rows.filter(r=>!r.sample)}));p.tasks=p.tasks.filter(t=>!t.sample);p.habits=p.habits.filter(h=>!h.sample);return p});
+  const out=async()=>{await writeAcct(acct.phone,{pin:acct.pin,data:JSON.stringify(s)});setAcct(null);setS(null);nav({bid:null,gid:null})};
+  const b=s.businesses.find(x=>x.id===nv.bid),g=b&&b.groups.find(x=>x.id===nv.gid);
+  return html`<div><header><h1>💖 Jays Ledger</h1>
+    <div className="nav"><button className=${tab==='biz'?'on':''} onClick=${()=>setTab('biz')}>Business Tracker</button><button className=${tab==='day'?'on':''} onClick=${()=>setTab('day')}>Daily Activities</button></div>
+    <div className="hr">${has?html`<${Confirm} label="Clear sample data" onYes=${clear} />`:null}<span style=${{fontSize:12}}>${st==='cloud'?'☁️ Saved':st==='device'?'📱 Saved on this device':''}</span><button className="ghost" onClick=${out}>Sign out</button></div></header>
+    <div className="wrap">${tab==='day'?html`<${Daily} s=${s} set=${set} />`:!b?html`<${Businesses} s=${s} set=${set} nav=${nav} />`:!g?html`<${BizHome} s=${s} set=${set} b=${b} nav=${nav} />`:html`<${Detail} s=${s} set=${set} b=${b} g=${g} nav=${nav} />`}</div></div>`;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
+</script></body></html>
