@@ -97,33 +97,37 @@ function newData(){
   return d;
 }
 
-const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co';
-const SUPABASE_ANON_KEY='YOUR_ANON_KEY';
-const supabase=(window.supabase&&SUPABASE_URL.includes('YOUR_PROJECT_ID')===false&&SUPABASE_ANON_KEY.includes('YOUR_')===false)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
-const isSupabaseReady=()=>!!supabase;
+const SUPABASE_URL='https://mpcwadvhhemkmsdzxuhq.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_rTfYJIm1l_O-y-PYzUdD1w_xSIWfLxD';
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-const norm=p=>{p=String(p).replace(/\D/g,'');if(p.length===11&&p[0]==='0')p='234'+p.slice(1);return p};
-const hash=async s=>{try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('jl:'+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return 'p:'+s}};
+const formatPhoneForOtp=raw=>{
+  const digits=String(raw||'').replace(/\D/g,'');
+  if(!digits)return'';
+  if(digits.startsWith('0'))return'+234'+digits.slice(1);
+  if(digits.startsWith('234'))return'+'+digits;
+  return'+'+digits;
+};
 
-const readAcct=async p=>{
-  if(isSupabaseReady()){
+const readAcct=async phone=>{
+  if(supabase){
     try{
-      const {data,error}=await supabase.from('accounts').select('*').eq('phone', p).maybeSingle();
+      const {data,error}=await supabase.from('accounts').select('*').eq('phone', phone).maybeSingle();
       if(!error) return data || null;
     }catch(e){}
   }
-  try{return JSON.parse(localStorage.getItem('jl-acct-'+p))}catch(e){return null};
+  try{return JSON.parse(localStorage.getItem('jl-acct-'+phone))||null}catch(e){return null};
 };
 
-const writeAcct=async(p,rec)=>{
-  const payload={phone:p,user_id:rec.user_id || rec.pin || null,data:typeof rec.data==='string'?rec.data:JSON.stringify(rec.data),updated_at:new Date().toISOString()};
-  if(isSupabaseReady()){
+const writeAcct=async(phone,rec)=>{
+  const payload={phone, user_id:rec.user_id, data:typeof rec.data==='string'?rec.data:JSON.stringify(rec.data), updated_at:new Date().toISOString()};
+  if(supabase){
     try{
       const {error}=await supabase.from('accounts').upsert(payload,{onConflict:'phone'});
       if(!error) return 'cloud';
     }catch(e){}
   }
-  try{localStorage.setItem('jl-acct-'+p,JSON.stringify(payload));return 'device';}catch(e){return 'device';}
+  try{localStorage.setItem('jl-acct-'+phone,JSON.stringify(payload)); return 'device';}catch(e){return 'device'};
 };
 
 function Confirm({onYes,label,cls='ghost'}){
@@ -139,85 +143,54 @@ function Manage({items}){
 }
 
 function Login({onIn}){
-  const [mode,setMode]=useState('login'),[ph,setPh]=useState(''),[pin,setPin]=useState(''),[pin2,setPin2]=useState(''),[otp,setOtp]=useState(''),[err,setErr]=useState(''),[busy,setBusy]=useState(false),[otpSent,setOtpSent]=useState(false);
+  const [mode,setMode]=useState('login'),[ph,setPh]=useState(''),[otp,setOtp]=useState(''),[err,setErr]=useState(''),[busy,setBusy]=useState(false),[otpSent,setOtpSent]=useState(false);
 
-  const legacyGo=async()=>{
-    setErr('');const p=norm(ph);
-    if(p.length<10)return setErr('Please enter a valid phone number.');
-    if(pin.length<4)return setErr('PIN must be at least 4 digits.');
-    setBusy(true);try{
-      const h=await hash(pin);let rec=await readAcct(p);
-      if(mode==='register'){
-        if(rec)return setErr('This number is already registered. Please log in.');
-        if(pin!==pin2)return setErr('The two PINs do not match.');
-        rec={pin:h,data:JSON.stringify(newData())};await writeAcct(p,rec);
-      }else{
-        if(!rec)return setErr('No account for this number yet. Tap Register.');
-        if(rec.pin!==h)return setErr('Wrong PIN. Please try again.');
-      }
-      onIn(p,h,JSON.parse(rec.data));
-    }finally{setBusy(false)}
-  };
-
-  const sendSupabaseOtp=async()=>{
-    setErr('');const p=norm(ph);
-    if(p.length<10)return setErr('Please enter a valid phone number.');
-    setBusy(true);try{
-      const {error}=await supabase.auth.signInWithOtp({phone:p, options:{shouldCreateUser:mode==='register'}});
+  const sendOtp=async()=>{
+    const phone=formatPhoneForOtp(ph);
+    setErr('');
+    if(!phone||phone.length<10)return setErr('Please enter a valid phone number.');
+    if(!supabase)return setErr('Supabase is not configured.');
+    setBusy(true);
+    try{
+      const {error}=await supabase.auth.signInWithOtp({phone, options:{shouldCreateUser:mode==='register'}});
       if(error) throw error;
       setOtpSent(true);
       setErr('');
-    }catch(e){setErr(e.message || 'Could not send SMS code.');}
+    }catch(e){setErr(e.message||'Could not send SMS code.');}
     finally{setBusy(false)}
   };
 
-  const verifySupabaseOtp=async()=>{
-    setErr('');const p=norm(ph);
-    if(p.length<10)return setErr('Please enter a valid phone number.');
-    if(!otp.trim())return setErr('Please enter the 6-digit SMS code.');
-    setBusy(true);try{
-      const {data,error}=await supabase.auth.verifyOtp({phone:p,token:otp.trim(),type:'sms'});
+  const verifyOtp=async()=>{
+    const phone=formatPhoneForOtp(ph);
+    setErr('');
+    if(!phone||phone.length<10)return setErr('Please enter a valid phone number.');
+    if(!otp.trim())return setErr('Please enter the 6-digit code.');
+    if(!supabase)return setErr('Supabase is not configured.');
+    setBusy(true);
+    try{
+      const {data,error}=await supabase.auth.verifyOtp({phone,token:otp.trim(),type:'sms'});
       if(error) throw error;
-      let rec=await readAcct(p);
+      let rec=await readAcct(phone);
       if(mode==='register'){
-        if(rec && rec.user_id && rec.user_id!==data.user.id) return setErr('This phone number is already linked to another account.');
         if(!rec){
-          rec={user_id:data.user.id,phone:p,data:JSON.stringify(newData())};
-          await writeAcct(p,rec);
-        } else if(!rec.user_id){
-          rec={...rec,user_id:data.user.id};
-          await writeAcct(p,rec);
+          rec={user_id:data.user.id,phone,data:JSON.stringify(newData())};
+          await writeAcct(phone,rec);
+        }else{
+          if(rec.user_id && rec.user_id!==data.user.id) return setErr('This phone number is already linked to another account.');
+          rec={...rec,user_id:data.user.id,phone};
+          await writeAcct(phone,rec);
         }
       }else{
-        if(!rec)return setErr('No account for this number yet. Tap Register.');
-        if(rec.user_id && rec.user_id!==data.user.id)return setErr('This phone number is linked to a different user.');
+        if(!rec) return setErr('No account for this number yet. Tap Register.');
+        if(rec.user_id && rec.user_id!==data.user.id) return setErr('This phone number is linked to a different user.');
       }
-      const payload=rec&&rec.data?JSON.parse(rec.data):newData();
-      onIn(p,data.user.id,payload);
-    }catch(e){setErr(e.message || 'Code not accepted. Please try again.');}
+      onIn(phone,data.user.id,rec&&rec.data?JSON.parse(rec.data):newData());
+    }catch(e){setErr(e.message||'Code not accepted. Please try again.');}
     finally{setBusy(false)}
   };
 
-  const go=async()=>{
-    if(!isSupabaseReady()) return legacyGo();
-    if(!otpSent) return sendSupabaseOtp();
-    return verifySupabaseOtp();
-  };
-
+  const go=async()=>{if(!otpSent)return sendOtp(); return verifyOtp();};
   const key=e=>e.key==='Enter'&&go();
-
-  if(!isSupabaseReady()){
-    return html`<div className="wrap"><div className="card login">
-      <div className="logo">💖</div><h1 style=${{color:'#c42a66'}}>Jays Ledger</h1>
-      <p className="hint">Sign in with your phone number to see your business anywhere.</p>
-      <div className="seg"><button className=${mode==='login'?'on':''} onClick=${()=>{setMode('login');setErr('')}}>Login</button><button className=${mode==='register'?'on':''} onClick=${()=>{setMode('register');setErr('')}}>Register</button></div>
-      <input type="tel" inputMode="tel" placeholder="Phone number e.g. 0801 234 5678" value=${ph} onChange=${e=>setPh(e.target.value)} onKeyDown=${key} />
-      <input type="password" inputMode="numeric" placeholder=${mode==='register'?'Create a PIN (4+ digits)':'Your PIN'} value=${pin} onChange=${e=>setPin(e.target.value)} onKeyDown=${key} />
-      ${mode==='register'?html`<input type="password" inputMode="numeric" placeholder="Repeat PIN" value=${pin2} onChange=${e=>setPin2(e.target.value)} onKeyDown=${key} />`:null}
-      <div className="err">${err}</div>
-      <button className="btn" style=${{width:'100%'}} disabled=${busy} onClick=${go}>${busy?'Please wait…':mode==='register'?'Create my account':'Log in'}</button>
-    </div></div>`;
-  }
 
   return html`<div className="wrap"><div className="card login">
     <div className="logo">💖</div><h1 style=${{color:'#c42a66'}}>Jays Ledger</h1>
@@ -320,12 +293,12 @@ function Daily({s,set}){
 
 function App(){
   const [acct,setAcct]=useState(null),[s,setS]=useState(null),[tab,setTab]=useState('biz'),[nv,nav]=useState({bid:null,gid:null}),[st,setSt]=useState('');
-  useEffect(()=>{if(!acct||!s)return;const t=setTimeout(async()=>setSt(await writeAcct(acct.phone,{user_id:acct.userId||acct.pin,data:JSON.stringify(s)})),700);return()=>clearTimeout(t)},[s,acct]);
-  if(!acct)return html`<${Login} onIn=${(phone,userId,data)=>{setS(data);setAcct({phone,userId,pin:userId||null})}} />`;
+  useEffect(()=>{if(!acct||!s)return;const t=setTimeout(async()=>{const phone=formatPhoneForOtp(acct.phone);const next={user_id:acct.userId,phone,data:JSON.stringify(s)};setSt(await writeAcct(phone,next));},700);return()=>clearTimeout(t)},[s,acct]);
+  if(!acct)return html`<${Login} onIn=${(phone,userId,data)=>{setS(data);setAcct({phone,userId})}} />`;
   const set=fn=>setS(p=>fn(JSON.parse(JSON.stringify(p))));
   const has=s.businesses.some(b=>b.groups.some(x=>x.rows.some(r=>r.sample)))||s.tasks.some(t=>t.sample)||s.habits.some(h=>h.sample);
   const clear=()=>set(p=>{p.businesses.forEach(b=>b.groups.forEach(x=>{x.rows=x.rows.filter(r=>!r.sample)}));p.tasks=p.tasks.filter(t=>!t.sample);p.habits=p.habits.filter(h=>!h.sample);return p});
-  const out=async()=>{await writeAcct(acct.phone,{user_id:acct.userId||acct.pin,data:JSON.stringify(s)});setAcct(null);setS(null);nav({bid:null,gid:null})};
+  const out=async()=>{const phone=formatPhoneForOtp(acct.phone);await writeAcct(phone,{user_id:acct.userId,phone,data:JSON.stringify(s)});setAcct(null);setS(null);nav({bid:null,gid:null})};
   const b=s.businesses.find(x=>x.id===nv.bid),g=b&&b.groups.find(x=>x.id===nv.gid);
   return html`<div><header><h1>💖 Jays Ledger</h1>
     <div className="nav"><button className=${tab==='biz'?'on':''} onClick=${()=>setTab('biz')}>Business Tracker</button><button className=${tab==='day'?'on':''} onClick=${()=>setTab('day')}>Daily Activities</button></div>
