@@ -4,7 +4,7 @@
 <title>Jays Ledger</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#ffe3ee;--card:#fff;--ink:#4a1f33;--mute:#a0607a;--line:#ffc2d6;--pink:#ff9fc0;--soft:#ffd6e5;--rose:#e6417f;--rosed:#c42a66;--gold:#e8a0a8;--bad:#ffc9d6;--badt:#c0143c;--warn:#ffe9b8;--ok:#cdf5dc;--grad:linear-gradient(135deg,#ff7eb3,#e6417f);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#ffe3ee;--card:#fff;--ink:#4a1f33;--mute:#a0607a;--line:#ffc2d6;--pink:#ff9fc0;--soft:#ffd6e5;--rose:#e6417f;--rosed:#c42a66;--gold:#e8a0a8;--bad:#ffc9d6;--badt:#c0143c;--warn:#ffe9b8;--ok:#dff5d8;--grad:linear-gradient(135deg,#ff7eb3,#e6417f)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
 body{margin:0;background:linear-gradient(180deg,#ffd0e2,#fff0f6 40%,#fff);min-height:100vh;color:var(--ink);font-family:'Poppins',system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:#ff7eb3;z-index:10}
@@ -42,8 +42,7 @@ td.ro{white-space:nowrap;font-weight:600;color:var(--rosed);padding:6px 10px}
 .badge.low{background:var(--pink);color:var(--ink)}.badge.bad{background:var(--bad);color:var(--badt)}.badge.soon{background:var(--warn);color:var(--ink)}
 .p-Paid{background:var(--ok)!important}.p-Unpaid{background:var(--bad)!important}.p-Partial{background:var(--warn)!important}
 .empty{padding:28px;text-align:center;color:var(--mute)}
-.mm{position:relative}.mp{position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1.5px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(230,65,127,.25);padding:6px;z-index:15;min-width:250px;max-height:320px;overflow:auto}
-.mi{display:block;width:100%;text-align:left;background:none;padding:8px 10px;border-radius:10px}.mi:hover{background:var(--soft)}.mi.arm{background:var(--bad);color:var(--badt)}
+.mm{position:relative}.mp{position:absolute;right:0;top:100%;margin-top:4px;background:#fff;border:1.5px solid var(--line);border-radius:14px;box-shadow:0 10px 24px rgba(230,65,127,.25);padding:6px;z-index:15;min-width:220px}.mi{display:block;width:100%;text-align:left;background:none;padding:8px 10px;border-radius:10px}.mi:hover{background:var(--soft)}.mi.arm{background:var(--bad);color:var(--badt)}
 .two{display:grid;grid-template-columns:2fr 1fr;gap:16px}@media(max-width:800px){.two{grid-template-columns:1fr}}
 .prog{height:14px;background:var(--soft);border-radius:999px;overflow:hidden}.prog i{display:block;height:100%;background:var(--grad);border-radius:999px;transition:width .5s}
 .add{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;margin:12px 0}
@@ -54,7 +53,7 @@ td.ro{white-space:nowrap;font-weight:600;color:var(--rosed);padding:6px 10px}
 .chk.on{background:var(--grad);animation:pop .45s}
 @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.4) rotate(-12deg);box-shadow:0 0 0 8px rgba(255,159,192,.7)}100%{transform:scale(1)}}
 .pri-High{background:var(--bad);color:var(--badt)}.pri-Medium{background:var(--warn);color:var(--ink)}.pri-Low{background:var(--ok);color:var(--ink)}
-.login{max-width:400px;margin:6vh auto;text-align:center}.login .logo{font-size:48px}.login input{margin:6px 0;text-align:center;font-size:16px}
+.login{max-width:420px;margin:6vh auto;text-align:center}.login .logo{font-size:48px}.login input{margin:6px 0;text-align:center;font-size:16px}
 .seg{display:flex;background:var(--soft);border-radius:999px;padding:4px;margin:12px 0}.seg button{flex:1;background:none;padding:8px;border-radius:999px;font-weight:500;color:var(--rosed)}.seg button.on{background:var(--grad);color:#fff}
 .err{color:var(--badt);font-size:13px;min-height:18px}
 .modal{position:fixed;inset:0;background:rgba(74,31,51,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}.modal .card{width:min(640px,100%)}
@@ -64,6 +63,7 @@ textarea{width:100%;height:240px;font:12px monospace;border-radius:12px;border:1
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const {useState,useEffect,useRef}=React;const html=htm.bind(React.createElement);
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -89,27 +89,42 @@ function newData(){
   a.rows=[{id:uid(),sample:1,item:'Ankara maxi dress',cost:8000,sell:15000,qty:2,bal:0,ful:'In Stock'}];
   b.rows=[
     {id:uid(),sample:1,buyer:'Amina B.',phone:'+234 801 234 5678',item:'Lace gown (size 12)',cost:12000,sell:22000,qty:1,paid:10000,pay:'Partial',due:addDays(-2),ful:'Sourcing',notes:'Deliver to Bosso, Minna'},
-    {id:uid(),sample:1,buyer:'Zainab K.',phone:'+234 803 987 6543',item:'Ankara two-piece set',cost:9000,sell:16500,qty:1,paid:16500,pay:'Paid',due:addDays(5),ful:'Delivered',notes:'Pickup done'}];
+    {id:uid(),sample:1,buyer:'Zainab K.',phone:'+234 803 987 6543',item:'Ankara two-piece set',cost:9000,sell:16500,qty:1,paid:16500,pay:'Paid',due:addDays(5),ful:'Delivered',notes:'Pickup done'}
+  ];
   const t=iso(new Date());
-  let d={businesses:[{id:uid(),name:"jay's_apparel",groups:[a,b]}],
-    habits:[{id:uid(),sample:1,name:'Drink 2L of water',log:{}},{id:uid(),sample:1,name:'Update the ledger',log:{}}],
-    tasks:[{id:uid(),sample:1,text:'Follow up on Amina’s balance',pri:'High',time:'10:00',done:false,date:t},
-    {id:uid(),sample:1,text:'Pick up new stock from the market',pri:'Medium',time:'14:00',done:false,date:t},
-    {id:uid(),sample:1,text:'Post new arrivals on WhatsApp status',pri:'Low',time:'17:00',done:false,date:t}]};
+  let d={businesses:[{id:uid(),name:"jay's_apparel",groups:[a,b]}],habits:[{id:uid(),sample:1,name:'Drink 2L of water',log:{}},{id:uid(),sample:1,name:'Update the ledger',log:{}}],tasks:[{id:uid(),sample:1,text:'Follow up on Amina’s balance',pri:'High',time:'10:00',done:false,date:t},{id:uid(),sample:1,text:'Pick up new stock from the market',pri:'Medium',time:'14:00',done:false,date:t},{id:uid(),sample:1,text:'Post new arrivals on WhatsApp status',pri:'Low',time:'17:00',done:false,date:t}]};
   try{const o=JSON.parse(localStorage.getItem('blush-planner-v1'));if(o&&o.groups){d.businesses[0].groups=o.groups;d.tasks=o.tasks||[];d.habits=o.habits||[]}}catch(e){}
   return d;
 }
 
-/* ---------- storage: cloud (db) when available, else this device ---------- */
-let dbP;const getDb=()=>dbP||(dbP=(async()=>{try{return await window.claude.use('db')}catch(e){return null}})());
+const SUPABASE_URL='https://YOUR_PROJECT_ID.supabase.co';
+const SUPABASE_ANON_KEY='YOUR_ANON_KEY';
+const supabase=(window.supabase&&SUPABASE_URL.includes('YOUR_PROJECT_ID')===false&&SUPABASE_ANON_KEY.includes('YOUR_')===false)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+const isSupabaseReady=()=>!!supabase;
+
 const norm=p=>{p=String(p).replace(/\D/g,'');if(p.length===11&&p[0]==='0')p='234'+p.slice(1);return p};
-const hash=async s=>{try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('jl:'+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return'p:'+s}};
-const readAcct=async p=>{const db=await getDb();
-  if(db){try{const s=await db.doc('accounts/'+p).get();return s.exists?s.data():null}catch(e){}}
-  try{return JSON.parse(localStorage.getItem('jl-acct-'+p))}catch(e){return null}};
-const writeAcct=async(p,rec)=>{const db=await getDb();
-  if(db){try{await db.doc('accounts/'+p).set(rec);return'cloud'}catch(e){}}
-  try{localStorage.setItem('jl-acct-'+p,JSON.stringify(rec))}catch(e){}return'device'};
+const hash=async s=>{try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('jl:'+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return 'p:'+s}};
+
+const readAcct=async p=>{
+  if(isSupabaseReady()){
+    try{
+      const {data,error}=await supabase.from('accounts').select('*').eq('phone', p).maybeSingle();
+      if(!error) return data || null;
+    }catch(e){}
+  }
+  try{return JSON.parse(localStorage.getItem('jl-acct-'+p))}catch(e){return null};
+};
+
+const writeAcct=async(p,rec)=>{
+  const payload={phone:p,user_id:rec.user_id || rec.pin || null,data:typeof rec.data==='string'?rec.data:JSON.stringify(rec.data),updated_at:new Date().toISOString()};
+  if(isSupabaseReady()){
+    try{
+      const {error}=await supabase.from('accounts').upsert(payload,{onConflict:'phone'});
+      if(!error) return 'cloud';
+    }catch(e){}
+  }
+  try{localStorage.setItem('jl-acct-'+p,JSON.stringify(payload));return 'device';}catch(e){return 'device';}
+};
 
 function Confirm({onYes,label,cls='ghost'}){
   const [a,setA]=useState(false);
@@ -119,12 +134,15 @@ function Confirm({onYes,label,cls='ghost'}){
 function Manage({items}){
   const [o,setO]=useState(false),[a,setA]=useState(-1);
   return html`<div className="mm"><button className="ghost" onClick=${()=>{setO(!o);setA(-1)}}>⋯ Manage ▾</button>
-    ${o?html`<div className="mp">${items.map((it,i)=>html`<button key=${i} className=${'mi'+(a===i?' arm':'')} onClick=${()=>a===i?(setO(false),it.fn()):setA(i)}>${a===i?'Tap again to confirm: ':''}${it.label}</button>`)}</div>`:null}</div>`;
+    ${o?html`<div className="mp">${items.map((it,i)=>html`<button key=${i} className=${'mi'+(a===i?' arm':'')} onClick=${()=>a===i?(setO(false),it.fn()):setA(i)}>${a===i?'Tap again to confirm: ':''}${it.label}</button>`)}</div>`:null}
+  </div>`;
 }
 
 function Login({onIn}){
-  const [mode,setMode]=useState('login'),[ph,setPh]=useState(''),[pin,setPin]=useState(''),[pin2,setPin2]=useState(''),[err,setErr]=useState(''),[busy,setBusy]=useState(false);
-  const go=async()=>{setErr('');const p=norm(ph);
+  const [mode,setMode]=useState('login'),[ph,setPh]=useState(''),[pin,setPin]=useState(''),[pin2,setPin2]=useState(''),[otp,setOtp]=useState(''),[err,setErr]=useState(''),[busy,setBusy]=useState(false),[otpSent,setOtpSent]=useState(false);
+
+  const legacyGo=async()=>{
+    setErr('');const p=norm(ph);
     if(p.length<10)return setErr('Please enter a valid phone number.');
     if(pin.length<4)return setErr('PIN must be at least 4 digits.');
     setBusy(true);try{
@@ -138,17 +156,77 @@ function Login({onIn}){
         if(rec.pin!==h)return setErr('Wrong PIN. Please try again.');
       }
       onIn(p,h,JSON.parse(rec.data));
-    }finally{setBusy(false)}};
+    }finally{setBusy(false)}
+  };
+
+  const sendSupabaseOtp=async()=>{
+    setErr('');const p=norm(ph);
+    if(p.length<10)return setErr('Please enter a valid phone number.');
+    setBusy(true);try{
+      const {error}=await supabase.auth.signInWithOtp({phone:p, options:{shouldCreateUser:mode==='register'}});
+      if(error) throw error;
+      setOtpSent(true);
+      setErr('');
+    }catch(e){setErr(e.message || 'Could not send SMS code.');}
+    finally{setBusy(false)}
+  };
+
+  const verifySupabaseOtp=async()=>{
+    setErr('');const p=norm(ph);
+    if(p.length<10)return setErr('Please enter a valid phone number.');
+    if(!otp.trim())return setErr('Please enter the 6-digit SMS code.');
+    setBusy(true);try{
+      const {data,error}=await supabase.auth.verifyOtp({phone:p,token:otp.trim(),type:'sms'});
+      if(error) throw error;
+      let rec=await readAcct(p);
+      if(mode==='register'){
+        if(rec && rec.user_id && rec.user_id!==data.user.id) return setErr('This phone number is already linked to another account.');
+        if(!rec){
+          rec={user_id:data.user.id,phone:p,data:JSON.stringify(newData())};
+          await writeAcct(p,rec);
+        } else if(!rec.user_id){
+          rec={...rec,user_id:data.user.id};
+          await writeAcct(p,rec);
+        }
+      }else{
+        if(!rec)return setErr('No account for this number yet. Tap Register.');
+        if(rec.user_id && rec.user_id!==data.user.id)return setErr('This phone number is linked to a different user.');
+      }
+      const payload=rec&&rec.data?JSON.parse(rec.data):newData();
+      onIn(p,data.user.id,payload);
+    }catch(e){setErr(e.message || 'Code not accepted. Please try again.');}
+    finally{setBusy(false)}
+  };
+
+  const go=async()=>{
+    if(!isSupabaseReady()) return legacyGo();
+    if(!otpSent) return sendSupabaseOtp();
+    return verifySupabaseOtp();
+  };
+
   const key=e=>e.key==='Enter'&&go();
+
+  if(!isSupabaseReady()){
+    return html`<div className="wrap"><div className="card login">
+      <div className="logo">💖</div><h1 style=${{color:'#c42a66'}}>Jays Ledger</h1>
+      <p className="hint">Sign in with your phone number to see your business anywhere.</p>
+      <div className="seg"><button className=${mode==='login'?'on':''} onClick=${()=>{setMode('login');setErr('')}}>Login</button><button className=${mode==='register'?'on':''} onClick=${()=>{setMode('register');setErr('')}}>Register</button></div>
+      <input type="tel" inputMode="tel" placeholder="Phone number e.g. 0801 234 5678" value=${ph} onChange=${e=>setPh(e.target.value)} onKeyDown=${key} />
+      <input type="password" inputMode="numeric" placeholder=${mode==='register'?'Create a PIN (4+ digits)':'Your PIN'} value=${pin} onChange=${e=>setPin(e.target.value)} onKeyDown=${key} />
+      ${mode==='register'?html`<input type="password" inputMode="numeric" placeholder="Repeat PIN" value=${pin2} onChange=${e=>setPin2(e.target.value)} onKeyDown=${key} />`:null}
+      <div className="err">${err}</div>
+      <button className="btn" style=${{width:'100%'}} disabled=${busy} onClick=${go}>${busy?'Please wait…':mode==='register'?'Create my account':'Log in'}</button>
+    </div></div>`;
+  }
+
   return html`<div className="wrap"><div className="card login">
     <div className="logo">💖</div><h1 style=${{color:'#c42a66'}}>Jays Ledger</h1>
-    <p className="hint">Sign in with your phone number to see your business anywhere.</p>
-    <div className="seg"><button className=${mode==='login'?'on':''} onClick=${()=>{setMode('login');setErr('')}}>Login</button><button className=${mode==='register'?'on':''} onClick=${()=>{setMode('register');setErr('')}}>Register</button></div>
+    <p className="hint">We use Supabase phone OTP so your ledger is synced across devices.</p>
+    <div className="seg"><button className=${mode==='login'?'on':''} onClick=${()=>{setMode('login');setErr('');setOtpSent(false);setOtp('')}}>Login</button><button className=${mode==='register'?'on':''} onClick=${()=>{setMode('register');setErr('');setOtpSent(false);setOtp('')}}>Register</button></div>
     <input type="tel" inputMode="tel" placeholder="Phone number e.g. 0801 234 5678" value=${ph} onChange=${e=>setPh(e.target.value)} onKeyDown=${key} />
-    <input type="password" inputMode="numeric" placeholder=${mode==='register'?'Create a PIN (4+ digits)':'Your PIN'} value=${pin} onChange=${e=>setPin(e.target.value)} onKeyDown=${key} />
-    ${mode==='register'?html`<input type="password" inputMode="numeric" placeholder="Repeat PIN" value=${pin2} onChange=${e=>setPin2(e.target.value)} onKeyDown=${key} />`:null}
+    ${otpSent?html`<input type="text" inputMode="numeric" placeholder="Enter the 6-digit code" value=${otp} onChange=${e=>setOtp(e.target.value)} onKeyDown=${key} />`:null}
     <div className="err">${err}</div>
-    <button className="btn" style=${{width:'100%'}} disabled=${busy} onClick=${go}>${busy?'Please wait…':mode==='register'?'Create my account':'Log in'}</button>
+    <button className="btn" style=${{width:'100%'}} disabled=${busy} onClick=${go}>${busy?'Please wait…':otpSent?mode==='register'?'Verify registration':'Verify login':'Send code'}</button>
   </div></div>`;
 }
 
@@ -156,9 +234,9 @@ function Businesses({s,set,nav}){
   const [n,setN]=useState('');
   const add=()=>{if(!n.trim())return;const id=uid();set(p=>{p.businesses.push({id,name:n.trim(),groups:[mkGroup('In Stock',true),mkGroup('Orders',false)]});return p});setN('');nav({bid:id,gid:null})};
   return html`<div><h2>Choose your business</h2><p className="hint">Pick a business to open its In Stock and Orders.</p>
-    <div className="cards">${s.businesses.map(b=>html`<button key=${b.id} className="card pick" onClick=${()=>nav({bid:b.id,gid:null})}>
-      <b>🛍️ ${b.name}</b><small>${b.groups.reduce((a,g)=>a+g.rows.length,0)} entries · ${fmt(totals(b).pend)} pending</small></button>`)}</div>
-    <div className="bar"><input placeholder="New business name…" value=${n} onChange=${e=>setN(e.target.value)} onKeyDown=${e=>e.key==='Enter'&&add()} /><button className="btn" onClick=${add}>+ Add business</button></div></div>`;
+    <div className="cards">${s.businesses.map(b=>html`<button key=${b.id} className="card pick" onClick=${()=>nav({bid:b.id,gid:null})}><b>🛍️ ${b.name}</b><small>${b.groups.reduce((a,g)=>a+g.rows.length,0)} entries · ${fmt(totals(b).pend)} pending</small></button>`)}</div>
+    <div className="bar"><input placeholder="New business name…" value=${n} onChange=${e=>setN(e.target.value)} onKeyDown=${e=>e.key==='Enter'&&add()} /><button className="btn" onClick=${add}>+ Add business</button></div>
+  </div>`;
 }
 
 function toCsv(b){
@@ -171,8 +249,9 @@ function useCsv(b){
   const modal=csv!==null?html`<div className="modal"><div className="card"><b>Your CSV</b>
     <p className="hint">Direct download wasn’t available. Copy this and paste it into Sheets, or save it as a .csv file.</p>
     <textarea ref=${ta} readOnly value=${csv}></textarea>
-    <div className="bar"><button className="btn" onClick=${()=>{ta.current.select();try{document.execCommand('copy')}catch(e){}}}>Copy</button><button className="ghost" onClick=${()=>setCsv(null)}>Close</button></div></div></div>`:null;
-  return[exp,modal];
+    <div className="bar"><button className="btn" onClick=${()=>{ta.current.select();try{document.execCommand('copy')}catch(e){}}}>Copy</button><button className="ghost" onClick=${()=>setCsv(null)}>Close</button></div>
+  </div></div>`:null;
+  return [exp,modal];
 }
 
 function BizHome({s,set,b,nav}){
@@ -185,31 +264,21 @@ function BizHome({s,set,b,nav}){
     <div className="cards"><div className="card stat"><small>Total Revenue</small><b>${fmt(t.rev)}</b></div><div className="card stat"><small>Total Profit</small><b>${fmt(t.prof)}</b></div><div className="card stat"><small>Pending Balances</small><b>${fmt(t.pend)}</b></div></div>
     <p className="hint">Totals count rows that have a buyer name.</p>
     <h2>Stock & Orders</h2>
-    <div className="cards">${b.groups.map(g=>html`<button key=${g.id} className="card pick" onClick=${()=>nav({bid:b.id,gid:g.id})}><b>${g.stock?'📦':'🧾'} ${g.name}</b>
-      <small>${g.rows.length} ${g.rows.length===1?'entry':'entries'}${g.stock?'':' · '+fmt(g.rows.reduce((a,r)=>a+Math.max(0,bal(r)),0))+' pending'}</small></button>`)}
-      <button className="card pick" style=${{borderStyle:'dashed'}} onClick=${()=>{const g=mkGroup('New Group',false);ub(x=>{x.groups.push(g)});nav({bid:b.id,gid:g.id})}}><b>+ Add group</b><small>Create a new section</small></button></div>
+    <div className="cards">${b.groups.map(g=>html`<button key=${g.id} className="card pick" onClick=${()=>nav({bid:b.id,gid:g.id})}><b>${g.stock?'📦':'🧾'} ${g.name}</b><small>${g.rows.length} ${g.rows.length===1?'entry':'entries'}${g.stock?'':' · '+fmt(g.rows.reduce((a,r)=>a+Math.max(0,bal(r)),0))+' pending'}</small></button>`)}
+      <button className="card pick" style=${{borderStyle:'dashed'}} onClick=${()=>{const g=mkGroup('New Group',false);ub(x=>{x.groups.push(g)});nav({bid:b.id,gid:g.id})}}><b>+ Add group</b><small>Create a new section</small></button>
+    </div>
     ${modal}</div>`;
 }
 
 function Detail({s,set,b,g,nav}){
   const [q,setQ]=useState(''),[fp,setFp]=useState(''),[ff,setFf]=useState(''),[nt,setNt]=useState('text');
-  const [exp,modal]=useCsv(b);
-  const today=iso(new Date()),in3=addDays(3);
+  const [exp,modal]=useCsv(b);const today=iso(new Date()),in3=addDays(3);
   const upd=fn=>set(p=>{fn(p.businesses.find(x=>x.id===b.id).groups.find(y=>y.id===g.id));return p});
   const updRow=(id,k,v)=>upd(x=>{const r=x.rows.find(y=>y.id===id);r[k]=v;if(['sell','qty','paid'].includes(k))delete r.bal});
   const rows=g.rows.filter(r=>(!q||JSON.stringify(Object.values(r)).toLowerCase().includes(q.toLowerCase()))&&(!fp||r.pay===fp)&&(!ff||r.ful===ff));
-  const alerts=r=>{const o=[],bl=bal(r);
-    if(g.stock&&r.qty!==''&&r.qty!==undefined&&num(r.qty)<=2)o.push(['low','Low stock']);
-    if(r.due&&bl>0&&r.pay!=='Paid')o.push(r.due<today?['bad','Overdue']:r.due<=in3?['soon','Due soon']:null);
-    return o.filter(Boolean)};
-  const cell=(c,r)=>{
-    const v=c.id==='bal'?bal(r):(r[c.id]??'');const on=e=>updRow(r.id,c.id,e.target.value);
-    if(c.type==='select')return html`<select className=${c.id==='pay'?'p-'+v:''} value=${v} onChange=${on}><option value=""></option>${(c.opts||[]).map(o=>html`<option key=${o} value=${o}>${o}</option>`)}</select>`;
-    const money=c.type==='money'||c.type==='number';
-    return html`<input type=${money?'number':c.type} inputMode=${money?'decimal':undefined} style=${{minWidth:money?'95px':c.type==='date'?'135px':'140px'}} value=${v} onChange=${on} />`;
-  };
-  const items=[{label:'Delete group “'+g.name+'”',fn:()=>{set(p=>{const x=p.businesses.find(y=>y.id===b.id);x.groups=x.groups.filter(y=>y.id!==g.id);return p});nav({bid:b.id,gid:null})}},
-    ...g.cols.map(c=>({label:'Delete column “'+c.label+'”',fn:()=>upd(x=>{x.cols=x.cols.filter(y=>y.id!==c.id)})}))];
+  const alerts=r=>{const o=[],bl=bal(r);if(g.stock&&r.qty!==''&&r.qty!==undefined&&num(r.qty)<=2)o.push(['low','Low stock']);if(r.due&&bl>0&&r.pay!=='Paid')o.push(r.due<today?['bad','Overdue']:r.due<=in3?['soon','Due soon']:null);return o.filter(Boolean)};
+  const cell=(c,r)=>{const v=c.id==='bal'?bal(r):(r[c.id]??'');const on=e=>updRow(r.id,c.id,e.target.value);if(c.type==='select')return html`<select className=${c.id==='pay'?'p-'+v:''} value=${v} onChange=${on}><option value=""></option>${(c.opts||[]).map(o=>html`<option key=${o} value=${o}>${o}</option>`)}</select>`;const money=c.type==='money'||c.type==='number';return html`<input type=${money?'number':c.type} inputMode=${money?'decimal':undefined} style=${{minWidth:money?'95px':c.type==='date'?'135px':'140px'}} value=${v} onChange=${on} />`;};
+  const items=[{label:'Delete group “'+g.name+'”',fn:()=>{set(p=>{const x=p.businesses.find(y=>y.id===b.id);x.groups=x.groups.filter(y=>y.id!==g.id);return p});nav({bid:b.id,gid:null})}},...g.cols.map(c=>({label:'Delete column “'+c.label+'”',fn:()=>upd(x=>{x.cols=x.cols.filter(y=>y.id!==c.id)})}))];
   return html`<div><button className="back" onClick=${()=>nav({bid:b.id,gid:null})}>← ${b.name}</button>
     <div className="bar"><input className="gname" value=${g.name} title="Rename group" onChange=${e=>upd(x=>{x.name=e.target.value})} /></div>
     <div className="bar">
@@ -223,14 +292,8 @@ function Detail({s,set,b,g,nav}){
       <${Manage} items=${items} />
     </div>
     <div className="tw"><table>
-      <thead><tr><th className="n">Alerts</th>
-        ${g.cols.map(c=>html`<th key=${c.id}><input value=${c.label} title="Rename column" onChange=${e=>upd(x=>{x.cols.find(y=>y.id===c.id).label=e.target.value})} /></th>`)}
-        <th className="n">Profit</th><th className="n"></th></tr></thead>
-      <tbody>${rows.map(r=>{const al=alerts(r);return html`<tr key=${r.id} className=${al.some(a=>a[0]==='bad')?'bad':al.some(a=>a[0]==='soon')?'soon':''}>
-        <td>${al.map(a=>html`<span key=${a[1]} className=${'badge '+a[0]}>${a[1]}</span>`)}</td>
-        ${g.cols.map(c=>html`<td key=${c.id}>${cell(c,r)}</td>`)}
-        <td className="ro">${fmt(profit(r))}</td>
-        <td><${Confirm} cls="x" label="🗑" onYes=${()=>upd(x=>{x.rows=x.rows.filter(y=>y.id!==r.id)})} /></td></tr>`})}</tbody>
+      <thead><tr><th className="n">Alerts</th>${g.cols.map(c=>html`<th key=${c.id}><input value=${c.label} title="Rename column" onChange=${e=>upd(x=>{x.cols.find(y=>y.id===c.id).label=e.target.value})} /></th>`)}<th className="n">Profit</th><th className="n"></th></tr></thead>
+      <tbody>${rows.map(r=>{const al=alerts(r);return html`<tr key=${r.id} className=${al.some(a=>a[0]==='bad')?'bad':al.some(a=>a[0]==='soon')?'soon':''}><td>${al.map(a=>html`<span key=${a[1]} className=${'badge '+a[0]}>${a[1]}</span>`)}</td>${g.cols.map(c=>html`<td key=${c.id}>${cell(c,r)}</td>`)}<td className="ro">${fmt(profit(r))}</td><td><${Confirm} cls="x" label="🗑" onYes=${()=>upd(x=>{x.rows=x.rows.filter(y=>y.id!==r.id)})} /></td></tr>`})}</tbody>
     </table>${rows.length===0?html`<div className="empty">No rows here yet. Tap “+ Add row” ✨</div>`:null}</div>${modal}</div>`;
 }
 
@@ -247,35 +310,30 @@ function Daily({s,set}){
   return html`<div className="two">
     <div className="card"><div className="bar"><h2>Today’s plan</h2><input type="date" value=${d} onChange=${e=>e.target.value&&setD(e.target.value)} /></div>
       <div className="prog"><i style=${{width:pct+'%'}}></i></div><p className="hint" style=${{marginTop:6}}>${msg} · ${pct}%</p>
-      <div className="add"><input placeholder="Add a task…" value=${tx} onChange=${e=>setTx(e.target.value)} onKeyDown=${e=>e.key==='Enter'&&add()} />
-        <select value=${pr} onChange=${e=>setPr(e.target.value)}><option>High</option><option>Medium</option><option>Low</option></select>
-        <input type="time" value=${tm} onChange=${e=>setTm(e.target.value)} /><button className="btn" onClick=${add}>Add</button></div>
-      ${list.map(t=>html`<div key=${t.id} className=${'item'+(t.done?' done':'')}>
-        <button className=${'chk'+(t.done?' on':'')} aria-label="Toggle done" onClick=${()=>set(p=>{p.tasks.find(y=>y.id===t.id).done=!t.done;return p})}>${t.done?'✓':''}</button>
-        <span className="t">${t.text}</span>${t.time?html`<span className="badge low">${t.time}</span>`:null}<span className=${'badge pri-'+t.pri}>${t.pri}</span>
-        <button className="x" onClick=${()=>set(p=>{p.tasks=p.tasks.filter(y=>y.id!==t.id);return p})}>✕</button></div>`)}</div>
+      <div className="add"><input placeholder="Add a task…" value=${tx} onChange=${e=>setTx(e.target.value)} onKeyDown=${e=>e.key==='Enter'&&add()} /><select value=${pr} onChange=${e=>setPr(e.target.value)}><option>High</option><option>Medium</option><option>Low</option></select><input type="time" value=${tm} onChange=${e=>setTm(e.target.value)} /><button className="btn" onClick=${add}>Add</button></div>
+      ${list.map(t=>html`<div key=${t.id} className=${'item'+(t.done?' done':'')}><button className=${'chk'+(t.done?' on':'')} aria-label="Toggle done" onClick=${()=>set(p=>{p.tasks.find(y=>y.id===t.id).done=!t.done;return p})}>${t.done?'✓':''}</button><span className="t">${t.text}</span>${t.time?html`<span className="badge low">${t.time}</span>`:null}<span className=${'badge pri-'+t.pri}>${t.pri}</span><button className="x" onClick=${()=>set(p=>{p.tasks=p.tasks.filter(y=>y.id!==t.id);return p})}>✕</button></div>`)}</div>
     <div className="card"><h2>Habits & routines</h2>
       <div className="add" style=${{gridTemplateColumns:'1fr auto'}}><input placeholder="New habit…" value=${hn} onChange=${e=>setHn(e.target.value)} onKeyDown=${e=>e.key==='Enter'&&addH()} /><button className="btn" onClick=${addH}>Add</button></div>
-      ${s.habits.map(h=>html`<div key=${h.id} className=${'item'+(h.log[d]?' done':'')}>
-        <button className=${'chk'+(h.log[d]?' on':'')} aria-label="Toggle habit" onClick=${()=>set(p=>{const x=p.habits.find(y=>y.id===h.id);x.log[d]=!x.log[d];return p})}>${h.log[d]?'✓':''}</button>
-        <span className="t">${h.name}</span><span className="badge low">${streak(h)}🔥</span>
-        <button className="x" onClick=${()=>set(p=>{p.habits=p.habits.filter(y=>y.id!==h.id);return p})}>✕</button></div>`)}</div>
+      ${s.habits.map(h=>html`<div key=${h.id} className=${'item'+(h.log[d]?' done':'')}><button className=${'chk'+(h.log[d]?' on':'')} aria-label="Toggle habit" onClick=${()=>set(p=>{const x=p.habits.find(y=>y.id===h.id);x.log[d]=!x.log[d];return p})}>${h.log[d]?'✓':''}</button><span className="t">${h.name}</span><span className="badge low">${streak(h)}🔥</span><button className="x" onClick=${()=>set(p=>{p.habits=p.habits.filter(y=>y.id!==h.id);return p})}>✕</button></div>`)}</div>
   </div>`;
 }
 
 function App(){
   const [acct,setAcct]=useState(null),[s,setS]=useState(null),[tab,setTab]=useState('biz'),[nv,nav]=useState({bid:null,gid:null}),[st,setSt]=useState('');
-  useEffect(()=>{if(!acct||!s)return;const t=setTimeout(async()=>setSt(await writeAcct(acct.phone,{pin:acct.pin,data:JSON.stringify(s)})),700);return()=>clearTimeout(t)},[s,acct]);
-  if(!acct)return html`<${Login} onIn=${(phone,pin,data)=>{setS(data);setAcct({phone,pin})}} />`;
+  useEffect(()=>{if(!acct||!s)return;const t=setTimeout(async()=>setSt(await writeAcct(acct.phone,{user_id:acct.userId||acct.pin,data:JSON.stringify(s)})),700);return()=>clearTimeout(t)},[s,acct]);
+  if(!acct)return html`<${Login} onIn=${(phone,userId,data)=>{setS(data);setAcct({phone,userId,pin:userId||null})}} />`;
   const set=fn=>setS(p=>fn(JSON.parse(JSON.stringify(p))));
   const has=s.businesses.some(b=>b.groups.some(x=>x.rows.some(r=>r.sample)))||s.tasks.some(t=>t.sample)||s.habits.some(h=>h.sample);
   const clear=()=>set(p=>{p.businesses.forEach(b=>b.groups.forEach(x=>{x.rows=x.rows.filter(r=>!r.sample)}));p.tasks=p.tasks.filter(t=>!t.sample);p.habits=p.habits.filter(h=>!h.sample);return p});
-  const out=async()=>{await writeAcct(acct.phone,{pin:acct.pin,data:JSON.stringify(s)});setAcct(null);setS(null);nav({bid:null,gid:null})};
+  const out=async()=>{await writeAcct(acct.phone,{user_id:acct.userId||acct.pin,data:JSON.stringify(s)});setAcct(null);setS(null);nav({bid:null,gid:null})};
   const b=s.businesses.find(x=>x.id===nv.bid),g=b&&b.groups.find(x=>x.id===nv.gid);
   return html`<div><header><h1>💖 Jays Ledger</h1>
     <div className="nav"><button className=${tab==='biz'?'on':''} onClick=${()=>setTab('biz')}>Business Tracker</button><button className=${tab==='day'?'on':''} onClick=${()=>setTab('day')}>Daily Activities</button></div>
-    <div className="hr">${has?html`<${Confirm} label="Clear sample data" onYes=${clear} />`:null}<span style=${{fontSize:12}}>${st==='cloud'?'☁️ Saved':st==='device'?'📱 Saved on this device':''}</span><button className="ghost" onClick=${out}>Sign out</button></div></header>
-    <div className="wrap">${tab==='day'?html`<${Daily} s=${s} set=${set} />`:!b?html`<${Businesses} s=${s} set=${set} nav=${nav} />`:!g?html`<${BizHome} s=${s} set=${set} b=${b} nav=${nav} />`:html`<${Detail} s=${s} set=${set} b=${b} g=${g} nav=${nav} />`}</div></div>`;
+    <div className="hr">${has?html`<${Confirm} label="Clear sample data" onYes=${clear} />`:null}<span style=${{fontSize:12}}>${st==='cloud'?'☁️ Saved':st==='device'?'📱 Saved on this device':''}</span><button className="ghost" onClick=${out}>Sign out</button></div>
+  </header>
+    <div className="wrap">${tab==='day'?html`<${Daily} s=${s} set=${set} />`:!b?html`<${Businesses} s=${s} set=${set} nav=${nav} />`:!g?html`<${BizHome} s=${s} set=${set} b=${b} nav=${nav} />`:html`<${Detail} s=${s} set=${set} b=${b} g=${g} nav=${nav} />`}</div>
+  </div>`;
 }
 ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
-</script></body></html>
+</script>
+</body></html>
