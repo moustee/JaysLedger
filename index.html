@@ -64,6 +64,7 @@ textarea{width:100%;height:240px;font:12px monospace;border-radius:12px;border:1
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
 <script>
 const {useState,useEffect,useRef}=React;const html=htm.bind(React.createElement);
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -100,16 +101,49 @@ function newData(){
   return d;
 }
 
-/* ---------- storage: cloud (db) when available, else this device ---------- */
-let dbP;const getDb=()=>dbP||(dbP=(async()=>{try{return await window.claude.use('db')}catch(e){return null}})());
-const norm=p=>{p=String(p).replace(/\D/g,'');if(p.length===11&&p[0]==='0')p='234'+p.slice(1);return p};
-const hash=async s=>{try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('jl:'+s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return'p:'+s}};
-const readAcct=async p=>{const db=await getDb();
-  if(db){try{const s=await db.doc('accounts/'+p).get();return s.exists?s.data():null}catch(e){}}
-  try{return JSON.parse(localStorage.getItem('jl-acct-'+p))}catch(e){return null}};
-const writeAcct=async(p,rec)=>{const db=await getDb();
-  if(db){try{await db.doc('accounts/'+p).set(rec);return'cloud'}catch(e){}}
-  try{localStorage.setItem('jl-acct-'+p,JSON.stringify(rec))}catch(e){}return'device'};
+/* ---------- Supabase client ---------- */
+const SUPABASE_URL='https://mpcwadvhhemkmsdzxuhq.supabase.co';
+// anon (public) key. Safe in the browser as long as Row Level Security is on (see supabase_setup.sql).
+// The new-style publishable key also works here: sb_publishable_rTfYJIm1l_O-y-PYzUdD1w_xSIWfLxD
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wY3dhZHZoaGVta21zZHp4dWhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0ODk4OTYsImV4cCI6MjExMDA2NTg5Nn0.vN5i4X_sXbbVQZlzmm6Wx9Fmmtsa_CpQu8X5tLowMJI';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+
+/* ---------- auth functions (email + password) ---------- */
+const signUp=async(email,password)=>{
+  const options=/^https?:$/.test(location.protocol)?{emailRedirectTo:location.origin+location.pathname}:{};
+  const{data,error}=await sb.auth.signUp({email,password,options});
+  if(error)throw error;return data};
+const signIn=async(email,password)=>{
+  const{data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error)throw error;return data};
+const signOut=async()=>{try{await sb.auth.signOut()}catch(e){console.warn('signOut',e)}};
+const friendly=e=>{const m=String((e&&e.message)||e||'');
+  if(/invalid login credentials/i.test(m))return'Wrong email or password.';
+  if(/email not confirmed/i.test(m))return'Please confirm your email first. Check your inbox.';
+  if(/already registered/i.test(m))return'This email is already registered. Please log in.';
+  if(/rate limit/i.test(m))return'Too many attempts. Please wait a few minutes and try again.';
+  if(/failed to fetch|network/i.test(m))return'Network problem. Check your connection and try again.';
+  return m||'Something went wrong. Please try again.'};
+
+/* ---------- data: one row per user in Supabase, falls back to this device ---------- */
+const TABLE='ledger_data';
+const localKey=uid=>'jl-data-'+uid;
+const saveLedger=async(uid,d,cloudOk=true)=>{
+  if(cloudOk){
+    try{const{error}=await sb.from(TABLE).upsert({user_id:uid,data:d,updated_at:new Date().toISOString()});
+      if(error)throw error;return'cloud'}catch(e){console.warn('cloud save failed',e)}}
+  try{localStorage.setItem(localKey(uid),JSON.stringify(d))}catch(e){}
+  return'device'};
+const loadLedger=async uid=>{
+  try{
+    const{data,error}=await sb.from(TABLE).select('data').eq('user_id',uid).maybeSingle();
+    if(error)throw error;
+    if(data&&data.data&&data.data.businesses)return{d:data.data,where:'cloud'};
+    const d=newData();return{d,where:await saveLedger(uid,d,true)};
+  }catch(e){
+    console.warn('cloud load failed',e);
+    try{const l=JSON.parse(localStorage.getItem(localKey(uid)));if(l&&l.businesses)return{d:l,where:'device'}}catch(x){}
+    return{d:newData(),where:'device'}}};
 
 function Confirm({onYes,label,cls='ghost'}){
   const [a,setA]=useState(false);
@@ -122,31 +156,29 @@ function Manage({items}){
     ${o?html`<div className="mp">${items.map((it,i)=>html`<button key=${i} className=${'mi'+(a===i?' arm':'')} onClick=${()=>a===i?(setO(false),it.fn()):setA(i)}>${a===i?'Tap again to confirm: ':''}${it.label}</button>`)}</div>`:null}</div>`;
 }
 
-function Login({onIn}){
-  const [mode,setMode]=useState('login'),[ph,setPh]=useState(''),[pin,setPin]=useState(''),[pin2,setPin2]=useState(''),[err,setErr]=useState(''),[busy,setBusy]=useState(false);
-  const go=async()=>{setErr('');const p=norm(ph);
-    if(p.length<10)return setErr('Please enter a valid phone number.');
-    if(pin.length<4)return setErr('PIN must be at least 4 digits.');
-    setBusy(true);try{
-      const h=await hash(pin);let rec=await readAcct(p);
+function Login(){
+  const [mode,setMode]=useState('login'),[em,setEm]=useState(''),[pw,setPw]=useState(''),[pw2,setPw2]=useState(''),[err,setErr]=useState(''),[info,setInfo]=useState(''),[busy,setBusy]=useState(false);
+  const go=async()=>{setErr('');setInfo('');const email=em.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return setErr('Please enter a valid email address.');
+    if(pw.length<6)return setErr('Password must be at least 6 characters.');
+    if(mode==='register'&&pw!==pw2)return setErr('The two passwords do not match.');
+    setBusy(true);
+    try{
       if(mode==='register'){
-        if(rec)return setErr('This number is already registered. Please log in.');
-        if(pin!==pin2)return setErr('The two PINs do not match.');
-        rec={pin:h,data:JSON.stringify(newData())};await writeAcct(p,rec);
-      }else{
-        if(!rec)return setErr('No account for this number yet. Tap Register.');
-        if(rec.pin!==h)return setErr('Wrong PIN. Please try again.');
-      }
-      onIn(p,h,JSON.parse(rec.data));
-    }finally{setBusy(false)}};
+        const r=await signUp(email,pw);
+        if(r.user&&r.user.identities&&r.user.identities.length===0)return setErr('This email is already registered. Please log in.');
+        if(!r.session){setMode('login');setPw('');setPw2('');setInfo('Account created! Check your email to confirm it, then log in.')}
+      }else await signIn(email,pw);
+    }catch(e){setErr(friendly(e))}finally{setBusy(false)}};
   const key=e=>e.key==='Enter'&&go();
   return html`<div className="wrap"><div className="card login">
     <div className="logo">💖</div><h1 style=${{color:'#c42a66'}}>Jays Ledger</h1>
-    <p className="hint">Sign in with your phone number to see your business anywhere.</p>
-    <div className="seg"><button className=${mode==='login'?'on':''} onClick=${()=>{setMode('login');setErr('')}}>Login</button><button className=${mode==='register'?'on':''} onClick=${()=>{setMode('register');setErr('')}}>Register</button></div>
-    <input type="tel" inputMode="tel" placeholder="Phone number e.g. 0801 234 5678" value=${ph} onChange=${e=>setPh(e.target.value)} onKeyDown=${key} />
-    <input type="password" inputMode="numeric" placeholder=${mode==='register'?'Create a PIN (4+ digits)':'Your PIN'} value=${pin} onChange=${e=>setPin(e.target.value)} onKeyDown=${key} />
-    ${mode==='register'?html`<input type="password" inputMode="numeric" placeholder="Repeat PIN" value=${pin2} onChange=${e=>setPin2(e.target.value)} onKeyDown=${key} />`:null}
+    <p className="hint">Sign in with your email to see your business anywhere.</p>
+    <div className="seg"><button className=${mode==='login'?'on':''} onClick=${()=>{setMode('login');setErr('');setInfo('')}}>Login</button><button className=${mode==='register'?'on':''} onClick=${()=>{setMode('register');setErr('');setInfo('')}}>Register</button></div>
+    <input type="email" inputMode="email" autoComplete="email" placeholder="Email address" value=${em} onChange=${e=>setEm(e.target.value)} onKeyDown=${key} />
+    <input type="password" autoComplete=${mode==='register'?'new-password':'current-password'} placeholder=${mode==='register'?'Create a password (6+ characters)':'Your password'} value=${pw} onChange=${e=>setPw(e.target.value)} onKeyDown=${key} />
+    ${mode==='register'?html`<input type="password" autoComplete="new-password" placeholder="Repeat password" value=${pw2} onChange=${e=>setPw2(e.target.value)} onKeyDown=${key} />`:null}
+    ${info?html`<div className="hint" style=${{color:'#1a7f4b',margin:'6px 0'}}>${info}</div>`:null}
     <div className="err">${err}</div>
     <button className="btn" style=${{width:'100%'}} disabled=${busy} onClick=${go}>${busy?'Please wait…':mode==='register'?'Create my account':'Log in'}</button>
   </div></div>`;
@@ -264,13 +296,26 @@ function Daily({s,set}){
 }
 
 function App(){
-  const [acct,setAcct]=useState(null),[s,setS]=useState(null),[tab,setTab]=useState('biz'),[nv,nav]=useState({bid:null,gid:null}),[st,setSt]=useState('');
-  useEffect(()=>{if(!acct||!s)return;const t=setTimeout(async()=>setSt(await writeAcct(acct.phone,{pin:acct.pin,data:JSON.stringify(s)})),700);return()=>clearTimeout(t)},[s,acct]);
-  if(!acct)return html`<${Login} onIn=${(phone,pin,data)=>{setS(data);setAcct({phone,pin})}} />`;
+  const [user,setUser]=useState(null),[s,setS]=useState(null),[boot,setBoot]=useState(true),[tab,setTab]=useState('biz'),[nv,nav]=useState({bid:null,gid:null}),[st,setSt]=useState('');
+  const loaded=useRef(null),cloudOk=useRef(false);
+  /* restore session on page load + react to login / logout */
+  useEffect(()=>{
+    const{data:{subscription}}=sb.auth.onAuthStateChange((ev,session)=>{
+      if(ev==='SIGNED_OUT'){loaded.current=null;setUser(null);setS(null);setSt('');nav({bid:null,gid:null});setBoot(false);return}
+      if(session&&session.user&&(ev==='INITIAL_SESSION'||ev==='SIGNED_IN')){
+        const u=session.user;if(loaded.current===u.id)return;loaded.current=u.id;
+        setTimeout(async()=>{const r=await loadLedger(u.id);cloudOk.current=r.where==='cloud';setS(r.d);setSt(r.where);setUser(u);setBoot(false)},0);
+      }else if(ev==='INITIAL_SESSION')setBoot(false);
+    });
+    return()=>subscription.unsubscribe()},[]);
+  /* autosave */
+  useEffect(()=>{if(!user||!s)return;const t=setTimeout(async()=>setSt(await saveLedger(user.id,s,cloudOk.current)),700);return()=>clearTimeout(t)},[s,user]);
+  if(boot)return html`<div className="wrap"><p className="hint" style=${{textAlign:'center',marginTop:'20vh'}}>Loading…</p></div>`;
+  if(!user)return html`<${Login} />`;
   const set=fn=>setS(p=>fn(JSON.parse(JSON.stringify(p))));
   const has=s.businesses.some(b=>b.groups.some(x=>x.rows.some(r=>r.sample)))||s.tasks.some(t=>t.sample)||s.habits.some(h=>h.sample);
   const clear=()=>set(p=>{p.businesses.forEach(b=>b.groups.forEach(x=>{x.rows=x.rows.filter(r=>!r.sample)}));p.tasks=p.tasks.filter(t=>!t.sample);p.habits=p.habits.filter(h=>!h.sample);return p});
-  const out=async()=>{await writeAcct(acct.phone,{pin:acct.pin,data:JSON.stringify(s)});setAcct(null);setS(null);nav({bid:null,gid:null})};
+  const out=async()=>{await saveLedger(user.id,s,cloudOk.current);await signOut()};
   const b=s.businesses.find(x=>x.id===nv.bid),g=b&&b.groups.find(x=>x.id===nv.gid);
   return html`<div><header><h1>💖 Jays Ledger</h1>
     <div className="nav"><button className=${tab==='biz'?'on':''} onClick=${()=>setTab('biz')}>Business Tracker</button><button className=${tab==='day'?'on':''} onClick=${()=>setTab('day')}>Daily Activities</button></div>
