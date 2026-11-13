@@ -255,11 +255,11 @@ function Detail({s,set,b,g,nav}){
       <${Manage} items=${items} />
     </div>
     <div className="tw"><table>
-      <thead><tr><th className="n">Alerts</th>
+      <thead><tr>${g.stock?html`<th className="n">S/N</th>`:html`<th className="n">Alerts</th>`}
         ${g.cols.map(c=>html`<th key=${c.id}><input value=${c.label} title="Rename column" onChange=${e=>upd(x=>{x.cols.find(y=>y.id===c.id).label=e.target.value})} /></th>`)}
         <th className="n">Profit</th><th className="n"></th></tr></thead>
-      <tbody>${rows.map(r=>{const al=alerts(r);return html`<tr key=${r.id} className=${al.some(a=>a[0]==='bad')?'bad':al.some(a=>a[0]==='soon')?'soon':''}>
-        <td>${al.map(a=>html`<span key=${a[1]} className=${'badge '+a[0]}>${a[1]}</span>`)}</td>
+      <tbody>${rows.map(r=>{const al=g.stock?[]:alerts(r);return html`<tr key=${r.id} className=${al.some(a=>a[0]==='bad')?'bad':al.some(a=>a[0]==='soon')?'soon':''}>
+        ${g.stock?html`<td className="ro">${g.rows.indexOf(r)+1}</td>`:html`<td>${al.map(a=>html`<span key=${a[1]} className=${'badge '+a[0]}>${a[1]}</span>`)}</td>`}
         ${g.cols.map(c=>html`<td key=${c.id}>${cell(c,r)}</td>`)}
         <td className="ro">${fmt(profit(r))}</td>
         <td><${Confirm} cls="x" label="🗑" onYes=${()=>upd(x=>{x.rows=x.rows.filter(y=>y.id!==r.id)})} /></td></tr>`})}</tbody>
